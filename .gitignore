@@ -3,3 +3,4 @@ __pycache__/
 util.py
 test_llm.py
 .venv
+test_langchain.ipynb
