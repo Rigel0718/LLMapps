@@ -15,9 +15,8 @@ def get_text(docs: List[UploadedFile]) -> List[Document]:
     doc_list = []
 
     for doc in docs:
-        file_bytes = doc.getvalue()  # 바이트 데이터 추출 (UploadedFile객체는 BytesIO 객체를 상속한다)
+        file_bytes = doc.getvalue()  # 바이트 데이터 추출 (UploadedFile객체는 BytesIO 객체를 상속한다 즉 file_like 객체)
         file_name = doc.name  # UploadedFile 객체라서 `.name` 사용 가능
-
         # 확장자 체크
         if file_name.endswith(".docx"):
             suffix = ".docx"
