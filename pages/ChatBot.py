@@ -1,6 +1,8 @@
 import streamlit as st
 from util import get_text, get_text_chunks, get_vectorstore, get_conversation_chain
 
+MODEL = ['model1', 'model2', 'model3']
+
 def main():
     st.set_page_config(
         page_icon=':books:',
@@ -18,8 +20,9 @@ def main():
 
     with st.sidebar:
         upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
-        openai_api_key = st.text_input("OpenAI API Key", key="openai_api_key", type="password")
+        st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
+        st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
         process = st.button('process')
         
 
