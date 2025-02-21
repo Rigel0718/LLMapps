@@ -1,6 +1,6 @@
 # from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.vectorstores import Chroma
+from langchain_core.language_models import LanguageModelLike
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.base import Runnable
@@ -17,7 +17,7 @@ from typing import Any, List
 
 
 
-def _get_retriever_chain(vectorstore : VectorStore, llm) -> Runnable[Any, List[Document]] :
+def _get_retriever_chain(vectorstore : VectorStore, llm : LanguageModelLike) -> Runnable[Any, List[Document]] :
     '''
     vectorstore의 retriever를 이용하여, 기존 대화 기록을 반영하는 검색 쿼리를 생성하는 체인 구성
     즉, 대화의 흐름을 고려하여 어떤 내용을 검색해야하는지 결정하는 '체인'을 생성하는 함수.
@@ -39,7 +39,7 @@ def _get_retriever_chain(vectorstore : VectorStore, llm) -> Runnable[Any, List[D
     return retriever_chain
 
 
-def get_conversational_rag_chain(vectorstore, llm):
+def get_conversational_rag_chain(vectorstore : VectorStore, llm : LanguageModelLike):
     retriever_chain = _get_retriever_chain(vectorstore, llm)
     '''
     prompt 
