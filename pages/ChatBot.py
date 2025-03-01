@@ -27,16 +27,23 @@ def main():
     if 'chat_memory' not in st.session_state:
         st.session_state.chat_memory = None
 
+    if 'upload_files' not in st.session_state:
+        st.session_state.upload_files = None
+
     with st.sidebar:
-        st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True, key='upload_files')
+        st.session_state.upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
-        process = st.button('process')
+        rag_process = st.button('RAG PROCESS')
         
 
-    if process:
-        vectorstore = load_documents_chroma_vectorstore(st.session_state.upload_files)
+    if rag_process:
+        if st.session_state.upload_files is None:
+            st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
+        else :
+            vectorstore = load_documents_chroma_vectorstore(st.session_state.upload_files)
+            st.sidebar.success('✅ Upload to vector store completed!')
 
 
     # session state initialize
