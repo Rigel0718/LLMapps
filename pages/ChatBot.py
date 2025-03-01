@@ -1,7 +1,14 @@
 import streamlit as st
 from util import get_text, get_text_chunks, get_vectorstore, get_conversation_chain
+from langchain_openai import ChatOpenAI
 
 MODEL = ['model1', 'model2', 'model3']
+
+llm = ChatOpenAI(
+    api_key=st.session_state.openai_api_key, 
+    model=st.session_state.model,
+     temperature=0.3,
+      streaming=True )
 
 def main():
     st.set_page_config(
