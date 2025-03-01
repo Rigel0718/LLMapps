@@ -1,6 +1,8 @@
 import streamlit as st
 from util import get_text, get_text_chunks, get_vectorstore, get_conversation_chain
 from langchain_openai import ChatOpenAI
+from rag_retriever import get_conversational_rag_chain
+from rag_vectorstore import load_documents_chroma_vectorstore
 
 MODEL = ['model1', 'model2', 'model3']
 
@@ -26,22 +28,16 @@ def main():
         st.session_state.chat_memory = None
 
     with st.sidebar:
-        upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
+        st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True, key='upload_files')
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
         process = st.button('process')
         
 
-    # if process:
-    #     if not openai_api_key:
-    #         st.info('Please add your OpenAI API KEY to continue')
-    #         st.stop()
-    #     text_files = get_text(upload_files)
-    #     text_chunks = get_text_chunks(text_files)
-    #     vectors = get_vectorstore(text_chunks)
+    if process:
+        vectorstore = load_documents_chroma_vectorstore(st.session_state.upload_files)
 
-    #     st.session_state.conversation_chain = get_conversation_chain(vectors)   
 
     # session state initialize
     if 'messages' not in st.session_state:
@@ -57,14 +53,15 @@ def main():
         st.chat_message(message["role"]).write(message["content"])
 
     if query := st.chat_input('Please enter your Question'):
-        # if not openai_api_key:
-        #     st.info("Please add your OpenAI API key to continue.")
-        #     st.stop()
+        if not st.session_state.openai_api_key:
+            st.info("Please add your OpenAI API key to continue.")
+            st.stop()
         st.session_state.messages.append({"role": "user", "content": query})
         st.chat_message('user').write(query)
-        msg = 'respons'
-        st.session_state.messages.append({"role": "assistant", "content": msg})
-        st.chat_message("assistant").write(msg)
+        rag_chain = get_conversational_rag_chain(vectorstore, llm)
+        respons = rag_chain.invoke({'input' : query})
+        st.session_state.messages.append({"role": "assistant", "content": respons})
+        st.chat_message("assistant").write(respons)
 
 if __name__ == '__main__':
     main()
