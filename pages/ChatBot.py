@@ -1,5 +1,4 @@
 import streamlit as st
-from util import get_text, get_text_chunks, get_vectorstore, get_conversation_chain
 from langchain_openai import ChatOpenAI
 from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
@@ -11,6 +10,17 @@ llm = ChatOpenAI(
     model=st.session_state.model,
      temperature=0.3,
       streaming=True )
+
+from langchain.schema import AIMessage, HumanMessage
+
+def convert_chat_history(chat_messages):
+    """Streamlit의 세션 상태에서 저장된 채팅 기록을 LangChain 메시지 형식으로 변환"""
+    return [
+        HumanMessage(content=msg["content"]) if msg["role"] == "user" 
+        else AIMessage(content=msg["content"])
+        for msg in chat_messages
+    ]
+
 
 def main():
     st.set_page_config(
@@ -63,10 +73,19 @@ def main():
         if not st.session_state.openai_api_key:
             st.info("Please add your OpenAI API key to continue.")
             st.stop()
-        st.session_state.messages.append({"role": "user", "content": query})
         st.chat_message('user').write(query)
-        rag_chain = get_conversational_rag_chain(vectorstore, llm)
-        respons = rag_chain.invoke({'input' : query})
+
+        if st.session_state.upload_files is not None:
+            messages = convert_chat_history(st.session_state.message)
+            st.session_state.messages.append({"role": "user", "content": query})
+            rag_chain = get_conversational_rag_chain(vectorstore, llm)
+            respons = rag_chain.invoke({'messages': messages, 'input' : query})
+            
+        else:
+            st.session_state.messages.append({"role": "user", "content": query})
+            messages = convert_chat_history(st.session_state.message)
+            respons = llm.invoke(messages)
+            
         st.session_state.messages.append({"role": "assistant", "content": respons})
         st.chat_message("assistant").write(respons)
 
