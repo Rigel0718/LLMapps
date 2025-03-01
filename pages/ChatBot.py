@@ -3,7 +3,7 @@ from langchain_openai import ChatOpenAI
 from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
 
-MODEL = ['model1', 'model2', 'model3']
+MODEL = ['gpt-4o-mini', 'o3-mini']
 
 llm = ChatOpenAI(
     api_key=st.session_state.openai_api_key, 
@@ -34,9 +34,6 @@ def main():
     if 'conversation_chain' not in st.session_state:
         st.session_state.conversation_chain = None
 
-    if 'chat_memory' not in st.session_state:
-        st.session_state.chat_memory = None
-
     if 'upload_files' not in st.session_state:
         st.session_state.upload_files = None
 
@@ -58,13 +55,9 @@ def main():
 
     # session state initialize
     if 'messages' not in st.session_state:
-        # st.session_state.messages = [{"role": "assistant", "content": "Please, input your OpenAI key on sidebar and upload your own files?"}]
-        # st.chat_message('assistant').write('Please, input your OpenAI key on sidebar and upload your own files?')
         st.session_state.messages = [{"role": "assistant", "content": "Hello, How can I help you?"}]
 
 
-    
-    # st.session_state.messages = [{"role": "assistant", "content": "Hello, How can I help you?"}]
 
     for message in st.session_state.messages:
         st.chat_message(message["role"]).write(message["content"])
@@ -85,7 +78,7 @@ def main():
             st.session_state.messages.append({"role": "user", "content": query})
             messages = convert_chat_history(st.session_state.message)
             respons = llm.invoke(messages)
-            
+
         st.session_state.messages.append({"role": "assistant", "content": respons})
         st.chat_message("assistant").write(respons)
 
