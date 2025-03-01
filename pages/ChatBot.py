@@ -5,12 +5,6 @@ from rag_vectorstore import load_documents_chroma_vectorstore
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
-llm = ChatOpenAI(
-    api_key=st.session_state.openai_api_key, 
-    model=st.session_state.model,
-     temperature=0.3,
-      streaming=True )
-
 from langchain.schema import AIMessage, HumanMessage
 
 def convert_chat_history(chat_messages):
@@ -61,6 +55,13 @@ def main():
 
     for message in st.session_state.messages:
         st.chat_message(message["role"]).write(message["content"])
+
+    llm = ChatOpenAI(
+        api_key=st.session_state.openai_api_key, 
+        model=st.session_state.model,
+        temperature=0.3,
+        streaming=True )
+
 
     if query := st.chat_input('Please enter your Question'):
         if not st.session_state.openai_api_key:
