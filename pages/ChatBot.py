@@ -70,14 +70,14 @@ def main():
         st.chat_message('user').write(query)
 
         if st.session_state.upload_files is not None:
-            messages = convert_chat_history(st.session_state.message)
+            messages = convert_chat_history(st.session_state.messages)
             st.session_state.messages.append({"role": "user", "content": query})
             rag_chain = get_conversational_rag_chain(vectorstore, llm)
             respons = rag_chain.invoke({'messages': messages, 'input' : query})
             
         else:
             st.session_state.messages.append({"role": "user", "content": query})
-            messages = convert_chat_history(st.session_state.message)
+            messages = convert_chat_history(st.session_state.messages)
             respons = llm.invoke(messages)
 
         st.session_state.messages.append({"role": "assistant", "content": respons})
