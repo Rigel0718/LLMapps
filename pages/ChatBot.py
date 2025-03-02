@@ -31,6 +31,9 @@ def main():
     if 'upload_files' not in st.session_state:
         st.session_state.upload_files = None
 
+    if 'vectorstore' not in st.session_state:
+        st.session_state.vectorstore = None
+
     with st.sidebar:
         st.session_state.upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
@@ -69,7 +72,7 @@ def main():
             st.stop()
         st.chat_message('user').write(query)
 
-        if st.session_state.upload_files is not None:
+        if st.session_state.vectorstore is not None:
             messages = convert_chat_history(st.session_state.messages)
             st.session_state.messages.append({"role": "user", "content": query})
             rag_chain = get_conversational_rag_chain(vectorstore, llm)
