@@ -43,7 +43,7 @@ def main():
         
 
     if rag_process:
-        if st.session_state.upload_files is None:
+        if not st.session_state.upload_files:
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
             vectorstore = load_documents_chroma_vectorstore(st.session_state.upload_files)
