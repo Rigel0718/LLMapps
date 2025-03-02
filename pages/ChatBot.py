@@ -2,6 +2,7 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
+from rag_processing import get_text
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
@@ -46,7 +47,7 @@ def main():
         if not st.session_state.upload_files:
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
-            vectorstore = load_documents_chroma_vectorstore(st.session_state.upload_files)
+            vectorstore = load_documents_chroma_vectorstore(get_text(st.session_state.upload_files))
             st.sidebar.success('✅ Upload to vector store completed!')
 
 
