@@ -8,3 +8,6 @@ faiss-cpu
 pydantic
 chromadb
 pypdf
+python-pptx
+python-docx
+unstructured
