@@ -58,5 +58,5 @@ def get_conversational_rag_chain(vectorstore : VectorStore, llm : LanguageModelL
         ("user", "{input}"),
     ])
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
-
+    
     return create_retrieval_chain(retriever_chain, stuff_documents_chain)

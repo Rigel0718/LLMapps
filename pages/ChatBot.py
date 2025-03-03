@@ -3,6 +3,7 @@ from langchain_openai import ChatOpenAI
 from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
 from rag_processing import get_text
+import uuid
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
@@ -34,6 +35,9 @@ def main():
 
     if 'vectorstore' not in st.session_state:
         st.session_state.vectorstore = None
+
+    if "session_id" not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
 
     with st.sidebar:
         st.session_state.upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
@@ -78,7 +82,6 @@ def main():
         if st.session_state.upload_files:
             messages = convert_chat_history(st.session_state.messages)
             st.session_state.messages.append({"role": "user", "content": query})
-            print(st.session_state.vectorstore)
             rag_chain = get_conversational_rag_chain(st.session_state.vectorstore, llm)
             respons = rag_chain.invoke({'messages': messages, 'input' : query})
             
