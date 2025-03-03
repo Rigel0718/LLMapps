@@ -47,7 +47,9 @@ def main():
         if not st.session_state.upload_files:
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
-            vectorstore = load_documents_chroma_vectorstore(get_text(st.session_state.upload_files))
+            documents = get_text(st.session_state.upload_files)
+            print(documents)
+            st.session_state.vectorstore = load_documents_chroma_vectorstore(documents)
             st.sidebar.success('✅ Upload to vector store completed!')
 
 
@@ -73,10 +75,11 @@ def main():
             st.stop()
         st.chat_message('user').write(query)
 
-        if st.session_state.vectorstore is not None:
+        if st.session_state.upload_files:
             messages = convert_chat_history(st.session_state.messages)
             st.session_state.messages.append({"role": "user", "content": query})
-            rag_chain = get_conversational_rag_chain(vectorstore, llm)
+            print(st.session_state.vectorstore)
+            rag_chain = get_conversational_rag_chain(st.session_state.vectorstore, llm)
             respons = rag_chain.invoke({'messages': messages, 'input' : query})
             
         else:
