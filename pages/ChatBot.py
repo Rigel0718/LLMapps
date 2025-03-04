@@ -53,6 +53,9 @@ def main():
 
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
+    
+    if 'llm' not in st.session_state:
+        st.session_state.llm = None
 
     with st.sidebar:
         st.session_state.upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
@@ -80,7 +83,7 @@ def main():
     for message in st.session_state.messages:
         st.chat_message(message["role"]).write(message["content"])
 
-    llm = ChatOpenAI(
+    st.session_state.llm = ChatOpenAI(
         api_key=st.session_state.openai_api_key, 
         model=st.session_state.model,
         temperature=0.3,
@@ -96,11 +99,11 @@ def main():
         messages = convert_chat_history(st.session_state.messages)
 
         if st.session_state.upload_files:
-            rag_chain = get_conversational_rag_chain(st.session_state.vectorstore, llm)
+            rag_chain = get_conversational_rag_chain(st.session_state.vectorstore, st.session_state.llm)
             response = st.write_stream(stream_response(rag_chain, messages, query))   
             
         else:
-            response = st.write_stream(stream_response(llm, messages))   
+            response = st.write_stream(stream_response(st.session_state.llm, messages))   
 
         st.session_state.messages.append({"role": "assistant", "content": response})
 
