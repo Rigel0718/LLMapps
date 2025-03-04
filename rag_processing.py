@@ -7,7 +7,7 @@ import tempfile
 import os
 from typing import List
 
-def get_text(docs: List[UploadedFile]) -> List[Document]:
+def get_documents(docs: List[UploadedFile]) -> List[Document]:
     '''
     TODO
     splitter 유연성 높이기
