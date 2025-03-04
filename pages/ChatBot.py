@@ -4,7 +4,8 @@ from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
 from rag_processing import get_text
 import uuid
-
+import time
+from langchain.chains.llm import LLMChain
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
 from langchain.schema import AIMessage, HumanMessage
@@ -16,6 +17,26 @@ def convert_chat_history(chat_messages):
         else AIMessage(content=msg["content"])
         for msg in chat_messages
     ]
+
+from langchain.chains.base import Chain
+
+
+def _pick_chain_output_(chain : Chain, messages, query=None):
+    
+    if st.session_state.upload_files:
+        return chain.pick("answer").stream({'messages': messages, 'input' : query})
+    else:
+        return chain.pick("text").stream(messages)
+    
+    
+
+def stream_response(chain, messages, query=None):
+    with st.chat_message("assistant"):
+        
+        for chunk in _pick_chain_output_(chain,messages,query):
+            yield chunk
+            time.sleep(0.05)
+        
 
 
 def main():
@@ -78,20 +99,17 @@ def main():
             st.info("Please add your OpenAI API key to continue.")
             st.stop()
         st.chat_message('user').write(query)
+        st.session_state.messages.append({"role": "user", "content": query})
+        messages = convert_chat_history(st.session_state.messages)
 
         if st.session_state.upload_files:
-            messages = convert_chat_history(st.session_state.messages)
-            st.session_state.messages.append({"role": "user", "content": query})
             rag_chain = get_conversational_rag_chain(st.session_state.vectorstore, llm)
-            respons = rag_chain.invoke({'messages': messages, 'input' : query})
+            response = st.write_stream(stream_response(rag_chain, messages, query))   
             
         else:
-            st.session_state.messages.append({"role": "user", "content": query})
-            messages = convert_chat_history(st.session_state.messages)
-            respons = llm.invoke(messages)
+            response = st.write_stream(stream_response(llm, messages))   
 
-        st.session_state.messages.append({"role": "assistant", "content": respons})
-        st.chat_message("assistant").write(respons)
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
 if __name__ == '__main__':
     main()
