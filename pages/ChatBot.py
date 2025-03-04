@@ -5,7 +5,6 @@ from rag_vectorstore import load_documents_chroma_vectorstore
 from rag_processing import get_text
 import uuid
 import time
-from langchain.chains.llm import LLMChain
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
 from langchain.schema import AIMessage, HumanMessage
@@ -46,11 +45,6 @@ def main():
     )
     st.title("💬 Chatbot")
 
-    st.write("Hello, world!")
-
-    if 'conversation_chain' not in st.session_state:
-        st.session_state.conversation_chain = None
-
     if 'upload_files' not in st.session_state:
         st.session_state.upload_files = None
 
@@ -73,7 +67,6 @@ def main():
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
             documents = get_text(st.session_state.upload_files)
-            print(documents)
             st.session_state.vectorstore = load_documents_chroma_vectorstore(documents)
             st.sidebar.success('✅ Upload to vector store completed!')
 
