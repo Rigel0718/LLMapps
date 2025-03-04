@@ -11,7 +11,7 @@ def load_documents_chroma_vectorstore(docs : List[Document]) -> Chroma :
     vector_db = Chroma.from_documents(
         documents=docs,
         embedding=embedding,
-        persist_directory="./chroma_db", # default로 None이지만, 세션 종료하면 초기화 되는 것을 코드상 확실히 하기 위해서
+        persist_directory="./chroma_db",
         collection_name=f"{str(time.time()).replace('.', '')[:14]}_" + st.session_state['session_id']
     )
     
