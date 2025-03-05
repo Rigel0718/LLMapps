@@ -41,8 +41,6 @@ def main():
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
-        print('uplaod_files',st.session_state.upload_files)
-        print('upload_url', st.session_state.upload_url, type(st.session_state.upload_url))
         if rag_available():
             st.session_state.rag_process = st.button('RAG PROCESS')
         
