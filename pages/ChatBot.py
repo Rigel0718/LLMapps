@@ -2,7 +2,7 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
-from rag_processing import get_documents
+from rag_loader import get_documents
 import uuid
 import time
 MODEL = ['gpt-4o-mini', 'o3-mini']
