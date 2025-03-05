@@ -53,17 +53,16 @@ def get_documents(docs: List[UploadedFile]) -> List[Document]:
     return doc_list
 
 
-def get_url_documents(urls) -> List[Document]:
+def get_url_documents(url) -> List[Document]:
 
     doc_list=[]
 
-    for url in urls:
-        try:
-            loader = WebBaseLoader(url)
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size = 900, chunk_overlap = 200)
-            documents = loader.load_and_split(text_splitter=text_splitter)
-            doc_list.extend(documents)
-        except Exception as e:
-            st.error(f'Error loading url document from {url} : {e}')
+    try:
+        loader = WebBaseLoader(url)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size = 900, chunk_overlap = 200)
+        documents = loader.load_and_split(text_splitter=text_splitter)
+        doc_list.extend(documents)
+    except Exception as e:
+        st.error(f'Error loading url document from {url} : {e}')
 
     return doc_list

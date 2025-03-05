@@ -2,43 +2,13 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from rag_retriever import get_conversational_rag_chain
 from rag_vectorstore import load_documents_chroma_vectorstore
-from rag_loader import get_documents
+from rag_loader import get_documents, get_url_documents
+from utils import rag_available, convert_chat_history, stream_response
 import uuid
-import time
+
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
-from langchain.schema import AIMessage, HumanMessage
 
-def convert_chat_history(chat_messages):
-    """Streamlit의 세션 상태에서 저장된 채팅 기록을 LangChain 메시지 형식으로 변환"""
-    return [
-        HumanMessage(content=msg["content"]) if msg["role"] == "user" 
-        else AIMessage(content=msg["content"])
-        for msg in chat_messages
-    ]
-
-from langchain.chains.base import Chain
-
-
-def _pick_chain_output_(chain : Chain, messages, query=None):
-    
-    if rag_available():
-        return chain.pick("answer").stream({'messages': messages, 'input' : query})
-    else:
-        return chain.pick("text").stream(messages)
-    
-    
-
-def stream_response(chain, messages, query=None):
-    with st.chat_message("assistant"):
-        
-        for chunk in _pick_chain_output_(chain,messages,query):
-            yield chunk
-            time.sleep(0.05)
-        
-def rag_available() -> bool:
-    return st.session_state.upload_file is not None or st.session_state.upload_url is not None
-        
 
 def main():
     st.set_page_config(
@@ -51,7 +21,7 @@ def main():
         st.session_state.upload_files = None
 
     if 'upload_url' not in st.session_state:
-        st.session_state.upload_url =None
+        st.session_state.upload_url = None
 
     if 'vectorstore' not in st.session_state:
         st.session_state.vectorstore = None
@@ -62,23 +32,32 @@ def main():
     if 'llm' not in st.session_state:
         st.session_state.llm = None
 
+    if 'rag_process'not in st.session_state:
+        st.session_state.rag_process = False
+    
     with st.sidebar:
         st.session_state.upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
         st.session_state.upload_url = st.text_input("🌐 upload URL")
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
-
+        print('uplaod_files',st.session_state.upload_files)
+        print('upload_url', st.session_state.upload_url, type(st.session_state.upload_url))
         if rag_available():
-            st.toast("RAG is now available", icon="✅")
-        rag_process = st.button('RAG PROCESS')
+            st.session_state.rag_process = st.button('RAG PROCESS')
         
 
-    if rag_process:
-        if not st.session_state.upload_files:
+    if st.session_state.rag_process:
+        if not rag_available():
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
-            documents = get_documents(st.session_state.upload_files)
+            documents = []
+            if st.session_state.upload_files:
+                file_documents = get_documents(st.session_state.upload_files)
+                documents.extend(file_documents)
+            if st.session_state.upload_url:
+                url_documents = get_url_documents(st.session_state.upload_url)
+                documents.extend(url_documents)
             st.session_state.vectorstore = load_documents_chroma_vectorstore(documents)
             st.sidebar.success('✅ Upload to vector store completed!')
 
