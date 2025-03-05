@@ -22,7 +22,7 @@ from langchain.chains.base import Chain
 
 def _pick_chain_output_(chain : Chain, messages, query=None):
     
-    if st.session_state.upload_files:
+    if rag_available():
         return chain.pick("answer").stream({'messages': messages, 'input' : query})
     else:
         return chain.pick("text").stream(messages)
@@ -36,7 +36,9 @@ def stream_response(chain, messages, query=None):
             yield chunk
             time.sleep(0.05)
         
-
+def rag_available() -> bool:
+    return st.session_state.upload_file is not None or st.session_state.upload_url is not None
+        
 
 def main():
     st.set_page_config(
@@ -66,8 +68,8 @@ def main():
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
-        
-        if st.session_state.upload_file is not None or st.session_state.upload_url is not None:
+
+        if rag_available():
             st.toast("RAG is now available", icon="✅")
         rag_process = st.button('RAG PROCESS')
         
@@ -105,7 +107,7 @@ def main():
         st.session_state.messages.append({"role": "user", "content": query})
         messages = convert_chat_history(st.session_state.messages)
 
-        if st.session_state.upload_files:
+        if rag_available():
             rag_chain = get_conversational_rag_chain(st.session_state.vectorstore, st.session_state.llm)
             response = st.write_stream(stream_response(rag_chain, messages, query))   
             
