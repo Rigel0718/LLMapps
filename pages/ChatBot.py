@@ -48,6 +48,9 @@ def main():
     if 'upload_files' not in st.session_state:
         st.session_state.upload_files = None
 
+    if 'upload_url' not in st.session_state:
+        st.session_state.upload_url =None
+
     if 'vectorstore' not in st.session_state:
         st.session_state.vectorstore = None
 
@@ -59,9 +62,13 @@ def main():
 
     with st.sidebar:
         st.session_state.upload_files = st.file_uploader('upload your files', type=['pdf', 'docx', 'pptx'], accept_multiple_files=True)
+        st.session_state.upload_url = st.text_input("🌐 upload URL")
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
+        
+        if st.session_state.upload_file is not None or st.session_state.upload_url is not None:
+            st.toast("RAG is now available", icon="✅")
         rag_process = st.button('RAG PROCESS')
         
 
