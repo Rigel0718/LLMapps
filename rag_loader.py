@@ -1,8 +1,8 @@
-from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader
+from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader, WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from langchain.docstore.document import Document
-
+import streamlit as st
 import tempfile
 import os
 from typing import List
@@ -49,5 +49,21 @@ def get_documents(docs: List[UploadedFile]) -> List[Document]:
             # 임시 파일 삭제 (try-finally로 보장)
             if os.path.exists(tmp_file_path):
                 os.remove(tmp_file_path)
+
+    return doc_list
+
+
+def get_url_documents(urls) -> List[Document]:
+
+    doc_list=[]
+
+    for url in urls:
+        try:
+            loader = WebBaseLoader(url)
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size = 900, chunk_overlap = 200)
+            documents = loader.load_and_split(text_splitter=text_splitter)
+            doc_list.extend(documents)
+        except Exception as e:
+            st.error(f'Error loading url document from {url} : {e}')
 
     return doc_list
