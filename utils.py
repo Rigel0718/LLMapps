@@ -35,4 +35,9 @@ def stream_response(chain, messages, query=None):
         
 
 def rag_available() -> bool:
+    '''
+    st.session_state.upload_files의 default -> []  empty list
+    st.session_state.upload_url 의 default -> ''   empty string
+    따라서 이 메서드는 둘 중 하나라도 검색가능한 document가 있다면, rag_available -> True
+    '''
     return st.session_state.upload_files  or st.session_state.upload_url 
