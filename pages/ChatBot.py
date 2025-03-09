@@ -5,6 +5,9 @@ from rag_vectorstore import load_documents_chroma_vectorstore, load_documents_fa
 from rag_loader import get_documents, get_url_documents
 from utils import rag_available, convert_chat_history, stream_response
 import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
