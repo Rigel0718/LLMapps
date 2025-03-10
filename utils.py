@@ -27,7 +27,7 @@ def _pick_chain_output_(chain : Chain, messages, query=None):
     if rag_available():
         return chain.pick("answer").stream({'messages': messages, 'input' : query})
     else:
-        return chain.pick("text").stream(messages)
+        return chain.stream(messages)
     
     
 
