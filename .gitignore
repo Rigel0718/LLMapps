@@ -4,3 +4,4 @@ util.py
 test_llm.py
 .venv
 test_langchain.ipynb
+example_data
