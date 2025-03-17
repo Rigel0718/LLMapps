@@ -1,0 +1,7 @@
+messages:
+  - role: placeholder
+    content: messages
+  - role: user
+    content: "{input}"
+  - role: user
+    content: "Given the above conversation, generate a search query to look up in order to get information relevant to the conversation, focusing on the most recent messages."
