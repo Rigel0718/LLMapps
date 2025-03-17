@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 from langchain.schema import AIMessage, HumanMessage
-
+import yaml
 
 def convert_chat_history(chat_messages):
     '''
@@ -52,3 +52,8 @@ def rag_available() -> bool:
     따라서 이 메서드는 둘 중 하나라도 검색가능한 document가 있다면, rag_available -> True
     '''
     return st.session_state.upload_files  or st.session_state.upload_url 
+
+def get_chat_prompt_yaml(file_path):
+    with open(file_path, "r", encoding='utf8') as f:
+        yaml_content = yaml.safe_load(f)
+        return [(message['role'], message['content']) for message in yaml_content['messages']]
