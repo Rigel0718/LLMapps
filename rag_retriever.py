@@ -7,6 +7,7 @@ from langchain_core.runnables.base import Runnable
 from langchain_core.vectorstores.base import VectorStore
 from langchain.docstore.document import Document
 from typing import Any, List
+from utils import get_chat_prompt_yaml
 
 '''
 대화의 흐름과 vectorstore의 자료, 두 가지 모두 참고하여 대화하는 chat bot chain.
@@ -48,15 +49,7 @@ def get_conversational_rag_chain(vectorstore : VectorStore, llm : LanguageModelL
     messages : 기존 대화의 흐름 정보
     input : user의 쿼리
     '''
-    prompt = ChatPromptTemplate.from_messages([
-        ("system",
-        """You are a helpful assistant. You will have to answer to user's queries.
-        You will have some context to help with your answers, but now always would be completely related or helpful.
-        You can also use your knowledge to assist answering the user's queries.\n 
-        {context}"""),
-        MessagesPlaceholder(variable_name="messages"),
-        ("user", "{input}"),
-    ])
+    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml('prompts/basic_prompt.yaml'))
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
     
     return create_retrieval_chain(retriever_chain, stuff_documents_chain)
