@@ -1,6 +1,6 @@
 messages:
   - role: placeholder
-    content: messages
+    content: "{messages}"
   - role: user
     content: "{input}"
   - role: user
