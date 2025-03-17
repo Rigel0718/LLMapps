@@ -29,11 +29,7 @@ def _get_retriever_chain(vectorstore : VectorStore, llm : LanguageModelLike) -> 
 
     # vectorstore의 retriever 설정
     retriever = vectorstore.as_retriever()
-    prompt = ChatPromptTemplate.from_messages([
-        MessagesPlaceholder(variable_name="messages"), # 기존 대화 messages 참고
-        ("user", "{input}"), # user 입력한 쿼리
-        ("user", "Given the above conversation, generate a search query to look up in order to get inforamtion relevant to the conversation, focusing on the most recent messages."),
-    ])
+    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml('prompts/retrieve_prompt.yaml'))
     # 체인 생성
     retriever_chain : List[Document] = create_history_aware_retriever(llm, retriever, prompt)
 
