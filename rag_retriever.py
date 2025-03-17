@@ -29,7 +29,8 @@ def _get_retriever_chain(vectorstore : VectorStore, llm : LanguageModelLike) -> 
 
     # vectorstore의 retriever 설정
     retriever = vectorstore.as_retriever()
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml('prompts/retrieve_prompt.yaml'))
+    prompt_filepath = 'prompts/retrieve_prompt.yaml'
+    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
     # 체인 생성
     retriever_chain : List[Document] = create_history_aware_retriever(llm, retriever, prompt)
 
@@ -45,7 +46,8 @@ def get_conversational_rag_chain(vectorstore : VectorStore, llm : LanguageModelL
     messages : 기존 대화의 흐름 정보
     input : user의 쿼리
     '''
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml('prompts/basic_prompt.yaml'))
+    prompt_filepath = 'prompts/basic_prompt.yaml'
+    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
     
     return create_retrieval_chain(retriever_chain, stuff_documents_chain)
