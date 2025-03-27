@@ -30,14 +30,19 @@ def main():
 
 
 
-if 'messages' not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Hello, How can I help you?"}]
+    if 'messages' not in st.session_state:
+            st.session_state.messages = [{"role": "assistant", "content": "Hello, How can I help you?"}]
 
-for message in st.session_state.messages:
-        st.chat_message(message["role"]).write(message["content"])
+    for message in st.session_state.messages:
+            st.chat_message(message["role"]).write(message["content"])
 
-st.session_state.llm = ChatOpenAI(
-        api_key=st.session_state.openai_api_key, 
-        model=st.session_state.model,
-        temperature=0.3,
-        streaming=True )
+    st.session_state.llm = ChatOpenAI(
+            api_key=st.session_state.openai_api_key, 
+            model=st.session_state.model,
+            temperature=0.3,
+            streaming=True )
+    
+
+if __name__ == '__main__':
+    main()
+
