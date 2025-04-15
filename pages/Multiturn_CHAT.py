@@ -2,7 +2,7 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate
-from utils import get_chat_prompt_yaml, stream_response
+from utils import get_chat_prompt_yaml, multiturn_stream_response
 from langchain_core.output_parsers import StrOutputParser
 from message_history import get_message_history_sqlitedb, configs_fields
 
@@ -69,7 +69,7 @@ def main():
             st.info("Please add your OpenAI API key to continue.")
             st.stop()
 
-        response = st.write_stream(stream_response(chat_message_history_chain, query))   
+        st.write_stream(multiturn_stream_response(chat_message_history_chain, query, config))   
 
 if __name__ == '__main__':
     main()

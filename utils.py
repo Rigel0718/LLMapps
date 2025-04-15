@@ -43,6 +43,14 @@ def stream_response(chain, messages, query):
             yield chunk
             time.sleep(0.05)
 
+def multiturn_stream_response(chain, query, config):
+    with st.chat_message("assistant"):
+        
+        for chunk in chain.stream({'input' : query}, config):
+            yield chunk
+            time.sleep(0.05)
+
+
         
 
 def rag_available() -> bool:
