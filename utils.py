@@ -19,7 +19,7 @@ def convert_chat_history(chat_messages):
 from langchain.chains.base import Chain
 
 
-def _pick_chain_output_(chain : Chain, messages, query=None):
+def _pick_chain_output_(chain : Chain, messages, query):
     '''
     chain의 stream 출력을 따르면서, chatbot에 필요한 text형태의 key 값을 추출해주는 함수
     '''
@@ -27,11 +27,11 @@ def _pick_chain_output_(chain : Chain, messages, query=None):
     if rag_available():
         return chain.pick("answer").stream({'messages': messages, 'input' : query})
     else:
-        return chain.stream(messages)
+        return chain.stream({'messages': messages, 'input' : query})
     
     
 
-def stream_response(chain, messages, query=None):
+def stream_response(chain, messages, query):
     '''
     assistant가 stream형태의 답변을 구사할 수 있도록 만들어주는 함수
 
