@@ -4,7 +4,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate
 from utils import get_chat_prompt_yaml
 from langchain_core.output_parsers import StrOutputParser
-from message_history import get_message_history_sqlitedb, configs
+from message_history import get_message_history_sqlitedb, configs_fields
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
@@ -54,6 +54,13 @@ def main():
     
     chain = prompt | st.session_state.llm | StrOutputParser()
 
+    chat_message_history_chain = RunnableWithMessageHistory(
+          chain,
+          get_message_history_sqlitedb,
+          input_messages_key= 'input',
+          history_messages_key='messages',
+          history_factory_config=configs_fields
+    )
 if __name__ == '__main__':
     main()
 

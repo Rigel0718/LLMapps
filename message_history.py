@@ -9,7 +9,7 @@ def get_message_history_sqlitedb(client_id, conversation_num):
         connection='sqlite:///.db'
     )
 
-configs =[
+configs_fields =[
     ConfigurableFieldSpec(
         id='client_id',
         annotation=str,
