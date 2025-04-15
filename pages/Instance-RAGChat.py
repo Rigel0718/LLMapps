@@ -83,8 +83,7 @@ def main():
         if not st.session_state.openai_api_key:
             st.info("Please add your OpenAI API key to continue.")
             st.stop()
-        st.chat_message('user').write(query)
-        st.session_state.messages.append({"role": "user", "content": query})
+        st.chat_message('user').write(query)        
         messages = convert_chat_history(st.session_state.messages)
 
         if rag_available():
@@ -92,8 +91,8 @@ def main():
             response = st.write_stream(stream_response(rag_chain, messages, query))   
             
         else:
-            response = st.write_stream(stream_response(st.session_state.llm, messages))   
-
+            response = st.write_stream(stream_response(st.session_state.llm, messages, query))   
+        st.session_state.messages.append({"role": "user", "content": query})
         st.session_state.messages.append({"role": "assistant", "content": response})
 
 if __name__ == '__main__':
