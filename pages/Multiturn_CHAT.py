@@ -2,7 +2,7 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate
-from utils import get_chat_prompt_yaml
+from utils import get_chat_prompt_yaml, stream_response
 from langchain_core.output_parsers import StrOutputParser
 from message_history import get_message_history_sqlitedb, configs_fields
 
@@ -61,6 +61,16 @@ def main():
           history_messages_key='messages',
           history_factory_config=configs_fields
     )
+
+    config = {'configurable' : {'client_id' : st.session_state.client_id, 'conversation_num' : st.session_state.conversation_num}}
+
+    if query := st.chat_input('Please enter your Question'):
+        if not st.session_state.openai_api_key:
+            st.info("Please add your OpenAI API key to continue.")
+            st.stop()
+
+        response = st.write_stream(stream_response(chat_message_history_chain, query))   
+
 if __name__ == '__main__':
     main()
 
