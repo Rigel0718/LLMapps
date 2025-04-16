@@ -1,0 +1,9 @@
+messages:
+  - role: system
+    content: |
+      "You are a helpful assistant. You will answer the user's queries based on the conversation above."
+  - role: placeholder
+    content: "{messages}"
+  - role: user
+    content: "{input}"
+  
