@@ -31,17 +31,12 @@ def main():
 
     with st.sidebar:
         st.text_input("USER_ID", key='cliend_id')
-        st.session_state.call_user_chathistory = st.button("exist_ID")
+        st.session_state.call_user_chathistory = st.button("MAKE_NEW_CONVERSATION")
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
 
 
-    if 'messages' not in st.session_state:
-            st.session_state.messages = [{"role": "assistant", "content": "Hello, How can I help you?"}]
-
-    for message in st.session_state.messages:
-            st.chat_message(message["role"]).write(message["content"])
 
     prompt_filepath = 'prompts/basic_prompt.yaml'
     prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
