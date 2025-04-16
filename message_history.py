@@ -1,6 +1,5 @@
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain_core.runnables.utils import ConfigurableFieldSpec
-from langchain_core.runnables.history import RunnableWithMessageHistory
 
 def get_message_history_sqlitedb(client_id, conversation_num):
     return SQLChatMessageHistory(
