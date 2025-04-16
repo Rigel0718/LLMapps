@@ -41,9 +41,10 @@ def main():
 
     prompt_filepath = 'prompts/normal_prompt.yaml'
     prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
+    
     if st.session_state.client_id:
         loaded_messages = load_messages_from_sqlite(st.session_state.client_id, st.session_state.conversation_num)
-    # Streamlit에 보여주기
+    
         for message in loaded_messages:
             st.chat_message(message["role"]).write(message["content"])
 

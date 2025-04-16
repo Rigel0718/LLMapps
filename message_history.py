@@ -30,9 +30,9 @@ def load_messages_from_sqlite(client_id: str, conversation_num: str):
     history = SQLChatMessageHistory(
         table_name=client_id,
         session_id=conversation_num,
-        connection='sqlite:///.db'  # 실제 DB 경로
+        connection='sqlite:///.db' 
     )
-    messages = history.messages  # List of BaseMessage
+    messages = history.messages
     
     return [
         {"role": "user" if m.type == "human" else "assistant", "content": m.content}
