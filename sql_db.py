@@ -1,9 +1,9 @@
 from typing import Generator
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, Session
 from sqlalchemy import Integer, Text
-
+import json
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from langchain_core.messages import messages_from_dict
 
 Base = declarative_base()
 
@@ -37,3 +37,7 @@ def messages(session_id):
             getattr(message_model_class, 'session_id') == session_id
         ).order_by(message_model_class.id.asc())
     
+    chat = []
+    for msg in result:
+        chat.append(messages_from_dict([json.loads(msg.message)])[0])
+    return chat
