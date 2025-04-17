@@ -1,10 +1,10 @@
-from typing import Generator
+from typing import Generator, List
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, Session
 from sqlalchemy import Integer, Text
 import json
 from contextlib import contextmanager
 from sqlalchemy import create_engine
-from langchain_core.messages import messages_from_dict
+from langchain_core.messages import messages_from_dict, BaseMessage
 
 Base = declarative_base()
 
@@ -30,7 +30,7 @@ def get_db() -> Generator[Session, None, None]:
     with Session_local() as session:
         yield session
 
-def messages(session_id):
+def messages(session_id) -> List[BaseMessage]: 
     with get_db() as session:
         result = session.query(message_model_class).where(
             getattr(message_model_class, 'session_id') == session_id
