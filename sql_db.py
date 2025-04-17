@@ -1,4 +1,5 @@
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from typing import Generator
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, Session
 from sqlalchemy import Integer, Text
 
 from sqlalchemy import create_engine
@@ -18,4 +19,11 @@ def create_message_model(table_name):
     return Messages
 
 engine = create_engine(url='sqlite:///.db', echo=True)
+Session_local = sessionmaker(autoflush=True, bind=engine)
 
+def get_db() -> Generator[Session, None, None]:
+    local_session = Session_local()
+    try:
+        yield local_session
+    finally:
+        local_session.close()
