@@ -12,6 +12,8 @@ def create_message_model(table_name):
         __table_name__ = table_name
         id = Column(Integer, primary_key=True)
         session_id = Column(Text)
+        conversation_title = Column(Text)
         message = Column(Text)
 
     return Messages
+
