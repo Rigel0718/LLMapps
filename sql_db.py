@@ -21,9 +21,19 @@ def create_message_model(table_name):
 engine = create_engine(url='sqlite:///.db', echo=True)
 Session_local = sessionmaker(autoflush=True, bind=engine)
 
+message_model_class = create_message_model('table_sample')
+Base.metadata.create_all(engine)
+
 def get_db() -> Generator[Session, None, None]:
     local_session = Session_local()
     try:
         yield local_session
     finally:
         local_session.close()
+
+def messages(session_id):
+    with get_db() as session:
+        result = session.query(message_model_class).where(
+            getattr(message_model_class, 'session_id') == session_id
+        ).order_by(message_model_class.id.asc())
+    
