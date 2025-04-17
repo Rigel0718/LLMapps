@@ -2,6 +2,7 @@ from typing import Generator
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, Session
 from sqlalchemy import Integer, Text
 import json
+from contextlib import contextmanager
 from sqlalchemy import create_engine
 from langchain_core.messages import messages_from_dict
 
@@ -24,12 +25,10 @@ Session_local = sessionmaker(autoflush=True, bind=engine)
 message_model_class = create_message_model('table_sample')
 Base.metadata.create_all(engine)
 
+@contextmanager
 def get_db() -> Generator[Session, None, None]:
-    local_session = Session_local()
-    try:
-        yield local_session
-    finally:
-        local_session.close()
+    with Session_local() as session:
+        yield session
 
 def messages(session_id):
     with get_db() as session:
