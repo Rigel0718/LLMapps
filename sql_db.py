@@ -40,3 +40,10 @@ def messages(session_id) -> List[BaseMessage]:
     for msg in result:
         chat.append(messages_from_dict([json.loads(msg.message)])[0])
     return chat
+
+if __name__ == '__main__':
+    table_name = 'test_client1'
+    session_id = 0
+
+    user_message_list = messages(session_id=session_id)
+    print(user_message_list)
