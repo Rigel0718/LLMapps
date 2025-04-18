@@ -13,7 +13,7 @@ def create_message_model(table_name):
     class Messages(Base):
         __table_name__ = table_name
         id : Mapped[int] = mapped_column(Integer, primary_key=True)
-        session_id : Mapped[str] = mapped_column(Text)
+        session_id : Mapped[str] = mapped_column(Text, nullable=True)
         conversation_title : Mapped[str] = mapped_column(Text, nullable=True)
         message : Mapped[str] = mapped_column(Text, nullable=True)
 
@@ -33,7 +33,7 @@ def get_db() -> Generator[Session, None, None]:
 def messages(session_id) -> List[BaseMessage]: 
     with get_db() as session:
         result = session.query(message_model_class).where(
-            getattr(message_model_class, 'session_id') == session_id
+            getattr(message_model_class, message_model_class.session_id) == session_id
         ).order_by(message_model_class.id.asc())
     
     chat = []
