@@ -13,14 +13,14 @@ Base = declarative_base()
 
 def create_message_model(table_name):
 
-    class Messages(Base):
+    class Custom_Messages(Base):
         __tablename__ = table_name
         id : Mapped[int] = mapped_column(Integer, primary_key=True)
         session_id : Mapped[Optional[str]] = mapped_column(Text, nullable=True)
         conversation_title : Mapped[str] = mapped_column(Text, nullable=True)
         message : Mapped[str] = mapped_column(Text, nullable=True)
 
-    return Messages
+    return Custom_Messages
 
 
 engine = create_engine(url='sqlite:///.db', echo=True)
