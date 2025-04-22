@@ -41,7 +41,7 @@ def create_message_model(table_name):
 
     
 class CustomMessageConverter(BaseMessageConverter):
-    """The default message converter for SQLChatMessageHistory."""
+    """The custom message converter for SQLChatMessageHistory."""
 
     def __init__(self, table_name: str):
         self.model_class = create_message_model(table_name)
