@@ -32,6 +32,7 @@ def main():
     with st.sidebar:
         st.session_state.client_id = st.text_input("USER_ID", key='cliend_id')
         st.session_state.call_user_chathistory = st.button("MAKE_NEW_CONVERSATION")
+        st.session_state.conversation_num = st.text_input('Conversation_Num')
         st.text_input("OpenAI API Key", key="openai_api_key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')

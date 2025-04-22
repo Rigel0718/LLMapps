@@ -1,6 +1,6 @@
-from typing import Generator, List
+from typing import Generator, List, Optional
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, Session
-from sqlalchemy import Integer, Text
+from sqlalchemy import Integer, Text 
 import json
 from contextlib import contextmanager
 from sqlalchemy import create_engine
@@ -11,9 +11,9 @@ Base = declarative_base()
 def create_message_model(table_name):
 
     class Messages(Base):
-        __table_name__ = table_name
+        __tablename__ = table_name
         id : Mapped[int] = mapped_column(Integer, primary_key=True)
-        session_id : Mapped[str] = mapped_column(Text, nullable=True)
+        session_id : Mapped[Optional[str]] = mapped_column(Text, nullable=True)
         conversation_title : Mapped[str] = mapped_column(Text, nullable=True)
         message : Mapped[str] = mapped_column(Text, nullable=True)
 
@@ -22,7 +22,7 @@ def create_message_model(table_name):
 engine = create_engine(url='sqlite:///.db', echo=True)
 Session_local = sessionmaker(autoflush=True, bind=engine)
 
-message_model_class = create_message_model('table_sample')
+message_model_class = create_message_model('KK')
 Base.metadata.create_all(engine)
 
 @contextmanager
@@ -33,7 +33,7 @@ def get_db() -> Generator[Session, None, None]:
 def messages(session_id) -> List[BaseMessage]: 
     with get_db() as session:
         result = session.query(message_model_class).where(
-            getattr(message_model_class, message_model_class.session_id) == session_id
+            getattr(message_model_class, 'session_id') == session_id
         ).order_by(message_model_class.id.asc())
     
     chat = []
@@ -42,8 +42,8 @@ def messages(session_id) -> List[BaseMessage]:
     return chat
 
 if __name__ == '__main__':
-    table_name = 'test_client1'
-    session_id = 0
+    table_name = 'KK'
+    session_id = '0'
 
     user_message_list = messages(session_id=session_id)
     print(user_message_list)
