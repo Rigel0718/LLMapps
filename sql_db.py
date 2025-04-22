@@ -6,9 +6,6 @@ from langchain_core.messages import messages_from_dict, BaseMessage, message_to_
 from abc import ABC, abstractmethod
 
 
-
-
-
 # BaseMessageConverter is not packaged in LangChain, so I copied and pasted it directly 
 class BaseMessageConverter(ABC):
     """Convert BaseMessage to the SQLAlchemy model."""
