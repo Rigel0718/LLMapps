@@ -10,16 +10,7 @@ from abc import ABC, abstractmethod
 
 Base = declarative_base()
 
-def create_message_model(table_name):
 
-    class Messages(Base):
-        __tablename__ = table_name
-        id : Mapped[int] = mapped_column(Integer, primary_key=True)
-        session_id : Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-        conversation_title : Mapped[str] = mapped_column(Text, nullable=True)
-        message : Mapped[str] = mapped_column(Text, nullable=True)
-
-    return Messages
 
 engine = create_engine(url='sqlite:///.db', echo=True)
 Session_local = sessionmaker(autoflush=True, bind=engine)
@@ -63,7 +54,16 @@ class BaseMessageConverter(ABC):
     def get_sql_model_class(self) -> Any:
         """Get the SQLAlchemy model class."""
         raise NotImplementedError
+    def create_message_model(table_name):
 
+        class Messages(Base):
+            __tablename__ = table_name
+            id : Mapped[int] = mapped_column(Integer, primary_key=True)
+            session_id : Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+            conversation_title : Mapped[str] = mapped_column(Text, nullable=True)
+            message : Mapped[str] = mapped_column(Text, nullable=True)
+
+        return Messages
 
 
 
