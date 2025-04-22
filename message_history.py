@@ -32,7 +32,7 @@ def load_messages_from_sqlite(client_id: str, conversation_num: str):
     history = SQLChatMessageHistory(
         table_name=client_id,
         session_id=conversation_num,
-        connection='sqlite:///.db' 
+        connection='sqlite:///custom.db' 
     )
     messages = history.messages
     
