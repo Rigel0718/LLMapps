@@ -18,7 +18,7 @@ from utils import get_chat_prompt_yaml
 
 
 
-def _get_retriever_chain(vectorstore : VectorStore, llm : LanguageModelLike) -> Runnable[Any, List[Document]] :
+def get_retrievered_documents(vectorstore : VectorStore, llm : LanguageModelLike) -> Runnable[Any, List[Document]] :
     '''
     vectorstore의 retriever를 이용하여, 기존 대화 기록을 반영하는 검색 쿼리를 생성하는 체인 구성
     즉, 대화의 흐름을 고려하여 어떤 내용을 검색해야하는지 결정하는 '체인'을 생성하는 함수.
@@ -37,17 +37,3 @@ def _get_retriever_chain(vectorstore : VectorStore, llm : LanguageModelLike) -> 
     return retriever_chain
 
 
-def get_conversational_rag_chain(vectorstore : VectorStore, llm : LanguageModelLike):
-    retriever_chain = _get_retriever_chain(vectorstore, llm)
-    '''
-    prompt 
-    system : LLM의 역할 정의
-    context : 검색된 문서  (context인 이유는 create_stuff_documents_chain 함수의 document variable parameter의 기본값이 context이기 때문이다.)
-    messages : 기존 대화의 흐름 정보
-    input : user의 쿼리
-    '''
-    prompt_filepath = 'prompts/basic_prompt.yaml'
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
-    stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
-    
-    return create_retrieval_chain(retriever_chain, stuff_documents_chain)
