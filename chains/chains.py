@@ -6,6 +6,6 @@ from utils import get_chat_prompt_yaml
 
 def get_vanilla_chain(openai_api_key, model_name):
     prompt_filepath = '.prompts/normal_prompt.yaml'
-    prompt = ChatPromptTemplate(get_chat_prompt_yaml(prompt_filepath))
+    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
 
     return prompt | get_OpenAILLM(openai_api_key, model_name) | StrOutputParser()
