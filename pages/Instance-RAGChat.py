@@ -1,8 +1,8 @@
 import streamlit as st
 from langchain_openai import ChatOpenAI
-from rag.rag_retriever import get_conversational_rag_chain
-from rag.rag_vectorstore import load_documents_chroma_vectorstore, load_documents_faiss_vectorsotre
-from rag.rag_loader import get_documents, get_url_documents
+from rag.retriever import get_conversational_rag_chain
+from rag.vectorstore import load_documents_chroma_vectorstore, load_documents_faiss_vectorsotre
+from rag.dataloader import get_documents, get_url_documents
 from utils import rag_available, convert_chat_history, stream_response
 import uuid
 from dotenv import load_dotenv
