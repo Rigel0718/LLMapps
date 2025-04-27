@@ -16,7 +16,8 @@ def get_vanilla_chain(openai_api_key, model_name):
 
 
 
-def get_conversational_rag_chain(vectorstore : VectorStore, llm : LanguageModelLike):
+def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, model_name):
+    llm = get_OpenAILLM(openai_api_key, model_name)
     retriever_chain = get_retrievered_documents(vectorstore, llm)
     '''
     prompt 
