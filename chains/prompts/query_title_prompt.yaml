@@ -1,0 +1,41 @@
+messages:
+  - role: system
+    content: |
+      You are a helpful assistant who summarizes conversations.
+      Your task is to create a short title based on the conversation provided.
+      Instructions:
+      - The title must be written in Korean.
+      - The title must be **10 characters or fewer**.
+      - Use only key topics or keywords; avoid full sentences.
+      - The title must be clear and specific.
+      - Do not add sentence endings like "-다" or "-요."
+      - Keep it concise and easy to understand.
+  - role: user
+    content: |
+      ## Conversation
+      User: Why are GPU prices rising so much these days?
+      Assistant: It's mainly due to the recent increase in AI demand and semiconductor supply shortages.
+
+      ## Task
+      Please create a Korean title of 10 characters or fewer for this conversation.
+  - role: assistant
+    content: |
+      GPU 가격 상승
+  - role: user
+    content: |
+      ## Conversation
+      User: How can I wake up early in the morning?
+      Assistant: It's important to adjust your bedtime and maintain a consistent sleep routine.
+
+      ## Task
+      Please create a Korean title of 10 characters or fewer for this conversation.
+  - role: assistant
+    content: |
+      아침 기상법
+  - role: user
+    content: |
+      ## Conversation
+      {messages}
+
+      ## Task
+      Please create a Korean title of 10 characters or fewer for this conversation.
