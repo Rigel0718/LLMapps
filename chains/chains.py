@@ -32,6 +32,8 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
     
     return create_retrieval_chain(retriever_chain, stuff_documents_chain)
 
+
+
 def get_conversation_title_chain(openai_api_key, model_name):
     prompt_filepath = '.prompts/query_title_prompt.yaml'
     prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
