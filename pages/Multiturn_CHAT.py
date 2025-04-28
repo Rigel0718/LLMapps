@@ -1,10 +1,8 @@
 import streamlit as st
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.prompts import ChatPromptTemplate
-from utils import get_chat_prompt_yaml, multiturn_stream_response
-from langchain_core.output_parsers import StrOutputParser
+from utils import multiturn_stream_response
 from message_history import get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite
+from chains.chains import get_vanilla_chain
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
@@ -38,24 +36,15 @@ def main():
         st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
 
 
-
-
-    prompt_filepath = 'prompts/normal_prompt.yaml'
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
     
     if st.session_state.client_id:
         loaded_messages = load_messages_from_sqlite(st.session_state.client_id, st.session_state.conversation_num)
-    
+
         for message in loaded_messages:
             st.chat_message(message["role"]).write(message["content"])
 
-    st.session_state.llm = ChatOpenAI(
-            api_key=st.session_state.openai_api_key, 
-            model=st.session_state.model,
-            temperature=0.3,
-            streaming=True )
     
-    chain = prompt | st.session_state.llm | StrOutputParser()
+    chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
 
     chat_message_history_chain = RunnableWithMessageHistory(
           chain,
