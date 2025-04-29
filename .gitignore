@@ -5,4 +5,4 @@ test_llm.py
 .venv
 test_langchain.ipynb
 example_data
-*.db
+customdb/
