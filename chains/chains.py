@@ -34,7 +34,7 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
     prompt_file = 'basic_prompt.yaml'
     prompt_path = os.path.join(base_dir, "prompts", prompt_file)
     prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_path))
-    
+
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
     
     return create_retrieval_chain(retriever_chain, stuff_documents_chain)
@@ -42,6 +42,9 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
 
 
 def get_conversation_title_chain(openai_api_key, model_name):
-    prompt_filepath = '.prompts/query_title_prompt.yaml'
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
+
+    prompt_file = 'query_title_prompt.yaml'
+    prompt_path = os.path.join(base_dir, "prompts", prompt_file)
+    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_path))
+    
     return prompt | get_OpenAILLM(openai_api_key, model_name) | StrOutputParser()
