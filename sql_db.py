@@ -1,6 +1,6 @@
 from typing import Optional, Any
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, Session
-from sqlalchemy import Integer, Text 
+from sqlalchemy import Integer, Text, create_engine 
 import json
 from langchain_core.messages import messages_from_dict, BaseMessage, message_to_dict
 from abc import ABC, abstractmethod
