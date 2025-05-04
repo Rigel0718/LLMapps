@@ -56,6 +56,7 @@ def main():
                 st.session_state.client_id,
                 st.session_state.conversation_num
             )
+
             for message in loaded_messages:
                 st.chat_message(message["role"]).write(message["content"])
 
@@ -63,27 +64,31 @@ def main():
             if not st.session_state.openai_api_key:
                 st.info("🔑 OpenAI API Key를 입력해주세요.")
                 st.stop()
-    
+
+
+            chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
+            chat_message_history_chain = RunnableWithMessageHistory(
+                chain,
+                get_message_history_sqlitedb,
+                input_messages_key='input',
+                history_messages_key='messages',
+                history_factory_config=configs_fields
+            )
+
+            config = {
+                'configurable': {
+                    'client_id': st.session_state.client_id,
+                    'conversation_num': st.session_state.conversation_num
+                }
+            }
+
+            # 채팅 입력
+            if query := st.chat_input("🗨️ 질문을 입력하세요"):
+                st.chat_message("user").write(query)
+                st.write_stream(multiturn_stream_response(chat_message_history_chain, query, config))
+
 
     
-    chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
-
-    chat_message_history_chain = RunnableWithMessageHistory(
-          chain,
-          get_message_history_sqlitedb,
-          input_messages_key= 'input',
-          history_messages_key='messages',
-          history_factory_config=configs_fields
-    )
-
-    config = {'configurable' : {'client_id' : st.session_state.client_id, 'conversation_num' : st.session_state.conversation_num}}
-
-    if query := st.chat_input('Please enter your Question'):
-        if not st.session_state.openai_api_key:
-            st.info("Please add your OpenAI API key to continue.")
-            st.stop()
-        st.chat_message("user").write(query)
-        st.write_stream(multiturn_stream_response(chat_message_history_chain, query, config))   
 
 if __name__ == '__main__':
     main()
