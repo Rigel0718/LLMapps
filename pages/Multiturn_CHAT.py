@@ -47,12 +47,23 @@ def main():
             else:
                 st.warning("❗ 이미 존재하거나 유효하지 않은 이름입니다.")
 
+        # conversation_num 선택
+        st.session_state.conversation_num = selected_conv or st.session_state.conversation_num
 
-    if st.session_state.client_id:
-        loaded_messages = load_messages_from_sqlite(st.session_state.client_id, st.session_state.conversation_num)
+        # 메시지 불러오기
+        if st.session_state.conversation_num:
+            loaded_messages = load_messages_from_sqlite(
+                st.session_state.client_id,
+                st.session_state.conversation_num
+            )
+            for message in loaded_messages:
+                st.chat_message(message["role"]).write(message["content"])
 
-        for message in loaded_messages:
-            st.chat_message(message["role"]).write(message["content"])
+            # 모델 세팅 및 Runnable 구성
+            if not st.session_state.openai_api_key:
+                st.info("🔑 OpenAI API Key를 입력해주세요.")
+                st.stop()
+    
 
     
     chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
