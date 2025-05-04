@@ -33,7 +33,21 @@ def main():
             st.session_state.client_id = None
             st.warning("❗ 등록된 user_id가 없습니다.")
 
-    
+    if st.session_state.client_id:
+        st.title(f"💬 Conversations for {st.session_state.client_id}")
+
+        conv_list = st.session_state.conversation_list or []
+        selected_conv = st.selectbox("🗂️ 선택할 conversation_num", conv_list, key="conversation_selector")
+
+        new_conv = st.text_input("🆕 새 conversation_num 생성", key="new_conv")
+        if st.button("➕ Create New Conversation"):
+            if new_conv and new_conv not in conv_list:
+                st.session_state.conversation_list.append(new_conv)
+                st.session_state.conversation_num = new_conv
+            else:
+                st.warning("❗ 이미 존재하거나 유효하지 않은 이름입니다.")
+
+
     if st.session_state.client_id:
         loaded_messages = load_messages_from_sqlite(st.session_state.client_id, st.session_state.conversation_num)
 
