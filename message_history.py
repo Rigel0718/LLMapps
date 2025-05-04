@@ -1,7 +1,8 @@
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain_core.runnables.utils import ConfigurableFieldSpec
 from langchain_core.chat_history import BaseChatMessageHistory
-from sql_db import CustomMessageConverter
+from sql_db import CustomSQLChatMessageHistory, CustomMessageConverter
+
 
 def get_message_history_sqlitedb(client_id, conversation_num) -> BaseChatMessageHistory:
     return SQLChatMessageHistory(
@@ -16,7 +17,7 @@ def load_messages_from_sqlite(client_id: str, conversation_num: str):
     history = SQLChatMessageHistory(
         table_name=client_id,
         session_id=conversation_num,
-        connection='sqlite:///customdb/custom.db' ,
+        connection='sqlite:///customdb/custom.db',
         custom_message_converter=CustomMessageConverter(client_id)
     )
     messages = history.messages
