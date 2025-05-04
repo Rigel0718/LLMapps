@@ -18,12 +18,13 @@ def main():
     
 
     with st.sidebar:
-        st.session_state.client_id = st.text_input("USER_ID", key='cliend_id')
-        st.session_state.call_user_chathistory = st.button("MAKE_NEW_CONVERSATION")
-        st.session_state.conversation_num = st.text_input('Conversation_Num')
-        st.text_input("OpenAI API Key", key="openai_api_key", type="password")
+        st.header("🔐 User & Key 설정")
+        input_user_id = st.text_input("USER_ID", value=st.session_state.client_id or "")
+        user_check = st.button("🔍 Check USER_ID")
+        st.session_state.openai_api_key = st.text_input("OpenAI API Key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-        st.selectbox("🤖 Select a Model", options=MODEL, key = 'model')
+        st.selectbox("🤖 Select a Model", options=MODEL, key='model')
+    
 
 
     
