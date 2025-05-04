@@ -1,7 +1,7 @@
 import streamlit as st
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from utils import multiturn_stream_response
-from message_history import get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite
+from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, check_user_exists, get_conversation_nums)
 from chains.chains import get_vanilla_chain
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
@@ -25,7 +25,13 @@ def main():
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key='model')
     
-
+    if user_check:
+        if check_user_exists(input_user_id):
+            st.session_state.client_id = input_user_id
+            st.session_state.conversation_list = get_conversation_nums(input_user_id)
+        else:
+            st.session_state.client_id = None
+            st.warning("❗ 등록된 user_id가 없습니다.")
 
     
     if st.session_state.client_id:
