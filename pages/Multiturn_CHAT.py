@@ -10,20 +10,10 @@ MODEL = ['gpt-4o-mini', 'o3-mini']
 def main():
     st.set_page_config(page_title="Multiturn-CHAT")
 
-    if 'llm' not in st.session_state:
-        st.session_state.llm = None
-
-    if 'openai_api_key' not in st.session_state:
-          st.session_state.openai_api_key = None
-
-    if 'client_id' not in st.session_state:
-          st.session_state.client_id = None
-
-    if 'call_user_chathistory' not in st.session_state:
-          st.session_state.call_user_chathistory = None
-
-    if 'conversation_num' not in st.session_state:
-          st.session_state.conversation_num = None
+    # Session state 초기화
+    for key in ['client_id', 'conversation_num', 'openai_api_key', 'llm']:
+        if key not in st.session_state:
+            st.session_state[key] = None
 
     
 
