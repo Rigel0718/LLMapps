@@ -32,10 +32,11 @@ class BaseMessageConverter(ABC):
 Base = declarative_base()
 
 
-def create_message_model(table_name, base):
+def create_message_model(table_name, base=declarative_base()):
 
     class Custom_Messages(base):
         __tablename__ = table_name
+        __table_args__ = {'extend_existing': True}
         id : Mapped[int] = mapped_column(Integer, primary_key=True)
         session_id : Mapped[Optional[str]] = mapped_column(Text, nullable=True)
         conversation_title : Mapped[str] = mapped_column(Text, nullable=True)
@@ -48,7 +49,7 @@ class CustomMessageConverter(BaseMessageConverter):
     """The custom message converter for SQLChatMessageHistory."""
 
     def __init__(self, table_name: str):
-        self.model_class = create_message_model(table_name, declarative_base())
+        self.model_class = create_message_model(table_name)
 
     def from_sql_model(self, sql_message: Any) -> BaseMessage:
         return messages_from_dict([json.loads(sql_message.message)])[0]

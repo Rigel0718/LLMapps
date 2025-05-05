@@ -1,7 +1,8 @@
 import streamlit as st
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from utils import multiturn_stream_response
-from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, check_user_exists, get_conversation_nums)
+from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, 
+                             check_user_exists, get_conversation_nums, create_user_table_if_not_exists)
 from chains.chains import get_vanilla_chain
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
@@ -11,32 +12,90 @@ def main():
     st.set_page_config(page_title="Multiturn-CHAT")
 
     # Session state 초기화
-    for key in ['client_id', 'conversation_num', 'openai_api_key', 'llm']:
+    for key in ['user_id', 'conversation_num', 'openai_api_key', 'llm']:
         if key not in st.session_state:
             st.session_state[key] = None
 
-    
+    if "user_check_failed" not in st.session_state:
+        st.session_state.user_check_failed = False
+    if "ready_to_register" not in st.session_state:
+        st.session_state.ready_to_register = False
+
+    # ✅ 기본 conversation_num = "0"
+    if st.session_state.conversation_num is None:
+        st.session_state.conversation_num = "0"
 
     with st.sidebar:
         st.header("🔐 User & Key 설정")
-        input_user_id = st.text_input("USER_ID", value=st.session_state.client_id or "")
-        user_check = st.button("🔍 Check USER_ID")
+
+        if st.session_state.user_id:
+            st.success(f"✅ 로그인: {st.session_state.user_id}")
+            if st.button("🚪 로그아웃"):
+                for key in ['user_id', 'conversation_num', 'conversation_list', 'openai_api_key',
+                            'llm', 'user_check_failed', 'ready_to_register']:
+                    if key in st.session_state:
+                        del st.session_state[key]
+                st.rerun()
+        else:
+            input_user_id = st.text_input("USER_ID", value="")
+            user_check = st.button("🔍 Check USER_ID")
+
+            if user_check:
+                if input_user_id.strip() == "":
+                    st.warning("❗ USER_ID를 입력해주세요.")
+                    st.stop()
+
+                if check_user_exists(input_user_id):
+                    st.session_state.user_id = input_user_id
+                    st.session_state.conversation_list = get_conversation_nums(input_user_id)
+                    if "0" not in st.session_state.conversation_list:
+                        st.session_state.conversation_list.append("0")
+                    st.session_state.user_check_failed = False
+                    st.session_state.ready_to_register = False
+                else:
+                    st.session_state.user_id = None
+                    st.session_state.user_check_failed = True
+                    st.session_state.ready_to_register = True
+
         st.session_state.openai_api_key = st.text_input("OpenAI API Key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key='model')
-    
-    if user_check:
-        if check_user_exists(input_user_id):
-            st.session_state.client_id = input_user_id
-            st.session_state.conversation_list = get_conversation_nums(input_user_id)
-        else:
-            st.session_state.client_id = None
-            st.warning("❗ 등록된 user_id가 없습니다.")
 
-    if st.session_state.client_id:
-        st.title(f"💬 Conversations for {st.session_state.client_id}")
+    if st.session_state.user_check_failed:
+        st.warning("❗ 등록된 user_id가 없습니다.")
+        if st.session_state.ready_to_register:
+            if st.button("🆕 새로운 유저로 등록하시겠습니까?"):
+                create_user_table_if_not_exists(input_user_id)
+                st.success(f"✅ '{input_user_id}' 계정이 등록되었습니다.")
+                st.session_state.user_id = input_user_id
+                st.session_state.conversation_list = ["0"]
+                st.session_state.conversation_num = "0"
+                st.session_state.user_check_failed = False
+                st.session_state.ready_to_register = False
 
-        conv_list = st.session_state.conversation_list or []
+                # ✅ 이 시점에서 Runnable을 실행해 DB/table을 안전하게 생성
+                if st.session_state.openai_api_key:
+                    chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
+                    chat_message_history_chain = RunnableWithMessageHistory(
+                        chain,
+                        get_message_history_sqlitedb,
+                        input_messages_key='input',
+                        history_messages_key='messages',
+                        history_factory_config=configs_fields
+                    )
+                    config = {
+                        'configurable': {
+                            'client_id': st.session_state.user_id,
+                            'conversation_num': st.session_state.conversation_num
+                        }
+                    }
+                    # 빈 메시지 추가로 테이블 생성 유도
+                    chat_message_history_chain.invoke("", config)
+
+                st.stop()
+
+    if not st.session_state.user_check_failed and st.session_state.user_id:
+        conv_list = st.session_state.conversation_list or ["0"]
         selected_conv = st.selectbox("🗂️ 선택할 conversation_num", conv_list, key="conversation_selector")
 
         new_conv = st.text_input("🆕 새 conversation_num 생성", key="new_conv")
@@ -51,9 +110,9 @@ def main():
         st.session_state.conversation_num = selected_conv or st.session_state.conversation_num
 
         # 메시지 불러오기
-        if st.session_state.conversation_num:
+        if st.session_state.user_id and st.session_state.conversation_num and st.session_state.conversation_num.strip():
             loaded_messages = load_messages_from_sqlite(
-                st.session_state.client_id,
+                st.session_state.user_id,
                 st.session_state.conversation_num
             )
 
@@ -64,7 +123,6 @@ def main():
             if not st.session_state.openai_api_key:
                 st.info("🔑 OpenAI API Key를 입력해주세요.")
                 st.stop()
-
 
             chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
             chat_message_history_chain = RunnableWithMessageHistory(
@@ -77,19 +135,16 @@ def main():
 
             config = {
                 'configurable': {
-                    'client_id': st.session_state.client_id,
+                    'client_id': st.session_state.user_id,
                     'conversation_num': st.session_state.conversation_num
                 }
             }
 
-            # 채팅 입력
+            # 채팅 입력 (API 키가 있을 때만)
             if query := st.chat_input("🗨️ 질문을 입력하세요"):
                 st.chat_message("user").write(query)
                 st.write_stream(multiturn_stream_response(chat_message_history_chain, query, config))
 
 
-    
-
 if __name__ == '__main__':
     main()
-
