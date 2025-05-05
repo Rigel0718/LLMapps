@@ -4,6 +4,7 @@ from utils import multiturn_stream_response
 from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, 
                              check_user_exists, get_conversation_nums, create_user_table_if_not_exists)
 from chains.chains import get_vanilla_chain
+import time
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
 
@@ -56,7 +57,7 @@ def main():
                     st.session_state.user_id = None
                     st.session_state.user_check_failed = True
                     st.session_state.ready_to_register = True
-
+                st.rerun()
         st.session_state.openai_api_key = st.text_input("OpenAI API Key", type="password")
         "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
         st.selectbox("🤖 Select a Model", options=MODEL, key='model')
@@ -66,7 +67,7 @@ def main():
         if st.session_state.ready_to_register:
             if st.button("🆕 새로운 유저로 등록하시겠습니까?"):
                 create_user_table_if_not_exists(input_user_id)
-                st.success(f"✅ '{input_user_id}' 계정이 등록되었습니다.")
+                st.success(f"✅ '{input_user_id}' 계정이 등록되었습니다. 로그인 버튼을 눌러주세요.")
                 st.session_state.user_id = input_user_id
                 st.session_state.conversation_list = ["0"]
                 st.session_state.conversation_num = "0"
@@ -103,9 +104,12 @@ def main():
             if new_conv and new_conv not in conv_list:
                 st.session_state.conversation_list.append(new_conv)
                 st.session_state.conversation_num = new_conv
+                st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
+                time.sleep(3)
+                st.rerun()
             else:
                 st.warning("❗ 이미 존재하거나 유효하지 않은 이름입니다.")
-
+            
         # conversation_num 선택
         st.session_state.conversation_num = selected_conv or st.session_state.conversation_num
 
@@ -120,30 +124,31 @@ def main():
                 st.chat_message(message["role"]).write(message["content"])
 
             # 모델 세팅 및 Runnable 구성
-            if not st.session_state.openai_api_key:
-                st.info("🔑 OpenAI API Key를 입력해주세요.")
-                st.stop()
+            if st.session_state.openai_api_key:
 
-            chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
-            chat_message_history_chain = RunnableWithMessageHistory(
-                chain,
-                get_message_history_sqlitedb,
-                input_messages_key='input',
-                history_messages_key='messages',
-                history_factory_config=configs_fields
-            )
+                chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
+                chat_message_history_chain = RunnableWithMessageHistory(
+                    chain,
+                    get_message_history_sqlitedb,
+                    input_messages_key='input',
+                    history_messages_key='messages',
+                    history_factory_config=configs_fields
+                )
 
-            config = {
-                'configurable': {
-                    'client_id': st.session_state.user_id,
-                    'conversation_num': st.session_state.conversation_num
+                config = {
+                    'configurable': {
+                        'client_id': st.session_state.user_id,
+                        'conversation_num': st.session_state.conversation_num
+                    }
                 }
-            }
 
-            # 채팅 입력 (API 키가 있을 때만)
-            if query := st.chat_input("🗨️ 질문을 입력하세요"):
-                st.chat_message("user").write(query)
-                st.write_stream(multiturn_stream_response(chat_message_history_chain, query, config))
+                # 채팅 입력 (API 키가 있을 때만)
+                if query := st.chat_input("🗨️ 질문을 입력하세요"):
+                    st.chat_message("user").write(query)
+                    st.write_stream(multiturn_stream_response(chat_message_history_chain, query, config))
+            else :
+                st.chat_input("🗨️ OpenAI 키를 입력하면 채팅이 가능합니다", disabled=True)
+
 
 
 if __name__ == '__main__':
