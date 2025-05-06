@@ -134,6 +134,22 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
             ).delete()
             session.commit()
 
+    def store_conversation_title(self, title: str) -> None:
+        """처음 대화 생성 시, 빈 메시지와 함께 title을 저장"""
+        with self._make_sync_session() as session:
+            existing = session.query(self.sql_model_class).filter(
+                getattr(self.sql_model_class, self.session_id_field_name) == self.session_id
+            ).first()
+
+            if not existing:
+                row = self.sql_model_class(
+                    session_id=self.session_id,
+                    conversation_title=title,
+                    message=json.dumps(message_to_dict({"type": "system", "data": ""}))
+                )
+                session.add(row)
+                session.commit()
+
     @contextlib.contextmanager
     def _make_sync_session(self) -> Generator[SQLSession, None, None]:
         with self.session_maker() as session:
