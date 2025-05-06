@@ -65,7 +65,7 @@ class CustomMessageConverter(BaseMessageConverter):
 class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     '''
     SQLChatMessageHistory의 기본 셋에서 async 제거,
-    sqlalchemy의 engine과 orm base를 외부에서 등록하는 기능 추가.
+    conversation_title의 column추가, 필요한 메소드 추가.
     '''
     @property
     @deprecated("0.2.2", removal="1.0", alternative="session_maker")
@@ -158,6 +158,14 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
             for row in rows:
                 row.conversation_title = new_title
             session.commit()
+
+    def get_conversation_title(self) -> Optional[str]:
+        """현재 session_id에 해당하는 title을 하나 반환"""
+        with self._make_sync_session() as session:
+            row = session.query(self.sql_model_class).filter(
+                getattr(self.sql_model_class, self.session_id_field_name) == self.session_id
+            ).first()
+            return row.conversation_title if row else None
 
     @contextlib.contextmanager
     def _make_sync_session(self) -> Generator[SQLSession, None, None]:
