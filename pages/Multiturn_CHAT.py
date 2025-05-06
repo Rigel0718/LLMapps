@@ -67,33 +67,13 @@ def main():
         if st.session_state.ready_to_register:
             if st.button("🆕 새로운 유저로 등록하시겠습니까?"):
                 create_user_table_if_not_exists(input_user_id)
-                st.success(f"✅ '{input_user_id}' 계정이 등록되었습니다. 로그인 버튼을 눌러주세요.")
+                # st.success(f"✅ '{input_user_id}' 계정이 등록되었습니다. 로그인 버튼을 눌러주세요.")
                 st.session_state.user_id = input_user_id
                 st.session_state.conversation_list = ["0"]
                 st.session_state.conversation_num = "0"
                 st.session_state.user_check_failed = False
                 st.session_state.ready_to_register = False
-
-                # ✅ 이 시점에서 Runnable을 실행해 DB/table을 안전하게 생성
-                if st.session_state.openai_api_key:
-                    chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
-                    chat_message_history_chain = RunnableWithMessageHistory(
-                        chain,
-                        get_message_history_sqlitedb,
-                        input_messages_key='input',
-                        history_messages_key='messages',
-                        history_factory_config=configs_fields
-                    )
-                    config = {
-                        'configurable': {
-                            'client_id': st.session_state.user_id,
-                            'conversation_num': st.session_state.conversation_num
-                        }
-                    }
-                    # 빈 메시지 추가로 테이블 생성 유도
-                    chat_message_history_chain.invoke("", config)
-
-                st.stop()
+                st.rerun()
 
     if not st.session_state.user_check_failed and st.session_state.user_id:
         conv_list = st.session_state.conversation_list or ["0"]
