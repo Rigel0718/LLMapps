@@ -1,4 +1,4 @@
-from typing import Any, Generator, List, Optional, Sequence, cast
+from typing import Any, Generator, List, Optional, Sequence, cast, Union, Dict
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, scoped_session, Session as SQLSession
 from sqlalchemy import Integer, Text, create_engine 
 import json
@@ -76,23 +76,25 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     def __init__(
         self,
         session_id: str,
-        engine : Engine ,
-        base : DeclarativeMeta ,
+        connection: Union[Engine, str] = None,
         table_name: str = "message_store",
         session_id_field_name: str = "session_id",
         custom_message_converter: Optional[Any] = None,
+        engine_args: Optional[Dict[str, Any]] = None,
     ):
-        self.engine = engine  # 외부에서 공유된 엔진 사용
+        self.engine = create_engine(url=connection, **(engine_args or {}))
         self.session_maker = scoped_session(sessionmaker(bind=self.engine))
 
         self.session_id_field_name = session_id_field_name
-        self.converter = custom_message_converter or CustomMessageConverter(table_name, base)
+        self.converter = custom_message_converter or CustomMessageConverter(table_name)
         self.sql_model_class = self.converter.get_sql_model_class()
         if not hasattr(self.sql_model_class, session_id_field_name):
             raise ValueError("SQL model class must have session_id column")
 
         self.sql_model_class.metadata.create_all(self.engine)
         self.session_id = session_id
+
+
     @property
     def messages(self) -> List[BaseMessage]:  # type: ignore
         """Retrieve all messages from db"""
@@ -112,13 +114,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
 
     
     def get_messages(self) -> List[BaseMessage]:
-        with self._make_sync_session() as session:
-            result = (
-                session.query(self.sql_model_class)
-                .where(getattr(self.sql_model_class, self.session_id_field_name) == self.session_id)
-                .order_by(self.sql_model_class.id.asc())
-            )
-            return [self.converter.from_sql_model(record) for record in result]
+        return self.messages
 
     def add_message(self, message: BaseMessage) -> None:
         with self._make_sync_session() as session:
