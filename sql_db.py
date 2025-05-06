@@ -133,6 +133,17 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
             ).delete()
             session.commit()
 
+    @property
+    def title_map(self) -> dict[str, str]:
+        """현재 user 테이블에서 모든 session_id → title 매핑 조회"""
+        with self._make_sync_session() as session:
+            rows = session.query(
+                getattr(self.sql_model_class, self.session_id_field_name),
+                self.sql_model_class.conversation_title
+            ).distinct().all()
+            return {row[0]: row[1] for row in rows}
+
+
     def store_conversation_title(self, title: str) -> None:
         """처음 대화 생성 시, 빈 메시지와 함께 title을 저장"""
         with self._make_sync_session() as session:
