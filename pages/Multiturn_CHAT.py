@@ -73,6 +73,8 @@ def main():
                 st.session_state.conversation_num = "0"
                 st.session_state.user_check_failed = False
                 st.session_state.ready_to_register = False
+                st.success(f"✅ '{input_user_id}' 계정이 등록되었습니다.")
+                time.sleep(2)
                 st.rerun()
 
     if not st.session_state.user_check_failed and st.session_state.user_id:
