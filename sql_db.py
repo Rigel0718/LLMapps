@@ -29,7 +29,6 @@ class BaseMessageConverter(ABC):
         """Get the SQLAlchemy model class."""
         raise NotImplementedError
     
-Base = declarative_base()
 
 
 def create_message_model(table_name, base=declarative_base()):
@@ -149,6 +148,16 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
                 )
                 session.add(row)
                 session.commit()
+
+    def update_conversation_title(self, new_title: str) -> None:
+        """기존 대화의 모든 메시지에 conversation_title을 일괄 업데이트"""
+        with self._make_sync_session() as session:
+            rows = session.query(self.sql_model_class).filter(
+                getattr(self.sql_model_class, self.session_id_field_name) == self.session_id
+            ).all()
+            for row in rows:
+                row.conversation_title = new_title
+            session.commit()
 
     @contextlib.contextmanager
     def _make_sync_session(self) -> Generator[SQLSession, None, None]:
