@@ -51,13 +51,9 @@ def get_message_history_sqlitedb(client_id, conversation_num) -> BaseChatMessage
     )
 
 
-def load_messages_from_sqlite(client_id: str, conversation_num: str):
-    history = CustomSQLChatMessageHistory(
-        table_name=client_id,
-        session_id=conversation_num,
-        connection='sqlite:///customdb/custom.db',
-    )
-    messages = history.messages
+def load_messages_from_sqlite(chat_history : CustomSQLChatMessageHistory):
+    
+    messages = chat_history.messages
     
     return [
         {"role": "user" if m.type == "human" else "assistant", "content": m.content}
