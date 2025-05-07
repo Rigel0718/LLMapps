@@ -7,6 +7,7 @@ from chains.chains import get_vanilla_chain
 import time
 
 MODEL = ['gpt-4o-mini', 'o3-mini']
+DBURL = 'sqlite:///customdb/custom.db'
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
             st.success(f"✅ 로그인: {st.session_state.user_id}")
             if st.button("🚪 로그아웃"):
                 for key in ['user_id', 'conversation_num', 'conversation_list', 'openai_api_key',
-                            'llm', 'user_check_failed', 'ready_to_register']:
+                            'llm', 'user_check_failed', 'ready_to_register', 'chat_history']:
                     if key in st.session_state:
                         del st.session_state[key]
                 st.rerun()
@@ -94,9 +95,9 @@ def main():
             
         # conversation_num 선택
         st.session_state.conversation_num = selected_conv or st.session_state.conversation_num
-
         # 메시지 불러오기
         if st.session_state.user_id and st.session_state.conversation_num and st.session_state.conversation_num.strip():
+            st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
             loaded_messages = load_messages_from_sqlite(
                 st.session_state.user_id,
                 st.session_state.conversation_num
@@ -107,11 +108,12 @@ def main():
 
             # 모델 세팅 및 Runnable 구성
             if st.session_state.openai_api_key:
+                
 
                 chain = get_vanilla_chain(st.session_state.openai_api_key, st.session_state.model)
                 chat_message_history_chain = RunnableWithMessageHistory(
                     chain,
-                    get_message_history_sqlitedb,
+                    get_session_history= lambda config : st.session_state.chat_history,
                     input_messages_key='input',
                     history_messages_key='messages',
                     history_factory_config=configs_fields
@@ -123,6 +125,7 @@ def main():
                         'conversation_num': st.session_state.conversation_num
                     }
                 }
+                
 
                 # 채팅 입력 (API 키가 있을 때만)
                 if query := st.chat_input("🗨️ 질문을 입력하세요"):
