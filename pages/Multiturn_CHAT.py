@@ -98,10 +98,7 @@ def main():
         # 메시지 불러오기
         if st.session_state.user_id and st.session_state.conversation_num and st.session_state.conversation_num.strip():
             st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
-            loaded_messages = load_messages_from_sqlite(
-                st.session_state.user_id,
-                st.session_state.conversation_num
-            )
+            loaded_messages = load_messages_from_sqlite(st.session_state.chat_history)
 
             for message in loaded_messages:
                 st.chat_message(message["role"]).write(message["content"])
