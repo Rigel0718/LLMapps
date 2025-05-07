@@ -135,7 +135,10 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
 
     @property
     def title_map(self) -> dict[str, str]:
-        """현재 user 테이블에서 모든 session_id → title 매핑 조회"""
+        """
+        현재 user 테이블에서 모든 session_id → title 매핑 조회
+        output : {session_id : conversation_title, ...}
+        """
         with self._make_sync_session() as session:
             rows = session.query(
                 getattr(self.sql_model_class, self.session_id_field_name),
