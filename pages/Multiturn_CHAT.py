@@ -2,7 +2,8 @@ import streamlit as st
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from utils import multiturn_stream_response
 from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, 
-                             check_user_exists, get_conversation_nums, create_user_table_if_not_exists)
+                             check_user_exists, get_conversation_nums, create_user_table_if_not_exists,
+                             load_conversation_title_list)
 from chains.chains import get_vanilla_chain
 import time
 
@@ -82,26 +83,25 @@ def main():
     if not st.session_state.user_check_failed and st.session_state.user_id:
         # 계정의 db 정보 호출
         st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
-
-        conv_list = st.session_state.conversation_list or ["0"]
+        
+        # 계정의 db에서 conversation_title 추출
+        conv_list = load_conversation_title_list(st.session_state.chat_history)
         selected_conv = st.selectbox("🗂️ 선택할 conversation_num", conv_list, key="conversation_selector")
 
         new_conv = st.text_input("🆕 새 conversation_num 생성", key="new_conv")
         if st.button("➕ Create New Conversation"):
-            if new_conv and new_conv not in conv_list:
-                st.session_state.conversation_list.append(new_conv)
-                st.session_state.conversation_num = new_conv
-                st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
-                time.sleep(3)
-                st.rerun()
-            else:
-                st.warning("❗ 이미 존재하거나 유효하지 않은 이름입니다.")
+            st.session_state.conversation_list.append(new_conv)
+            st.session_state.conversation_num = new_conv
+            st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
+            time.sleep(3)
+            st.rerun()
+            
             
         # conversation_num 선택
         st.session_state.conversation_num = selected_conv or st.session_state.conversation_num
         # 메시지 불러오기
         if st.session_state.user_id and st.session_state.conversation_num and st.session_state.conversation_num.strip():
-            st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
+            
             loaded_messages = load_messages_from_sqlite(st.session_state.chat_history)
 
             for message in loaded_messages:
