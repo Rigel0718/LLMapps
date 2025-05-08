@@ -138,6 +138,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     def title_map(self) -> dict[str, str]:
         """
         SQLite에서 session_id 기준으로 하나의 conversation_title을 가져오는 매핑 딕셔너리 생성
+        {session_id : conversation_title, ...}
         """
         with self._make_sync_session() as session:
             session_id_column = getattr(self.sql_model_class, self.session_id_field_name)
