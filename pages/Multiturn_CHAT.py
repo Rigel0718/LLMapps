@@ -48,6 +48,7 @@ def main():
                     st.warning("❗ USER_ID를 입력해주세요.")
                     st.stop()
 
+                # 유저가 존재하는지 확인, 필요한 데이터 로드 후 rerun
                 if check_user_exists(input_user_id):
                     st.session_state.user_id = input_user_id
                     st.session_state.conversation_list = get_conversation_nums(input_user_id)

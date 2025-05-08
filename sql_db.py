@@ -135,6 +135,22 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
             session.commit()
 
     @property
+    def conversation_title_list(self) -> List[str]:
+        """
+        중복 없이 conversation_title 목록 추출
+        """
+        with self._make_sync_session() as session:
+            rows = (
+                session.query(self.sql_model_class.conversation_title)
+                .filter(self.sql_model_class.conversation_title.isnot(None))  # (선택) None 제거
+                .distinct()
+                .order_by(self.sql_model_class.conversation_title)  # (선택) 정렬
+                .all()
+            )
+            return [row[0] for row in rows]
+        
+
+    @property
     def title_map(self) -> dict[str, str]:
         """
         SQLite에서 session_id 기준으로 하나의 conversation_title을 가져오는 매핑 딕셔너리 생성
@@ -153,8 +169,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
             )
             return {row[0]: row[1] for row in rows}
 
-    def get_title_map(self) -> dict[str, str]:
-        return self.title_map
+
 
     def store_conversation_title(self, title: str) -> None:
         """처음 대화 생성 시, 빈 메시지와 함께 title을 저장"""

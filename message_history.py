@@ -63,7 +63,7 @@ def load_messages_from_sqlite(chat_history : CustomSQLChatMessageHistory):
 
 def load_conversation_title_list(chat_history : CustomSQLChatMessageHistory) -> List[str]:
 
-    title_map = chat_history.get_title_map()
+    title_map = chat_history.title_map
 
     return [title_map[i] for i in range(len(title_map))]
 
