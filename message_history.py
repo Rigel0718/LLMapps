@@ -3,6 +3,7 @@ from langchain_core.runnables.utils import ConfigurableFieldSpec
 from langchain_core.chat_history import BaseChatMessageHistory
 from sql_db import CustomSQLChatMessageHistory, CustomMessageConverter, create_message_model
 from sqlalchemy import create_engine, inspect, text
+from typing import List
 
 engine = create_engine('sqlite:///customdb/custom.db')
 
@@ -60,6 +61,11 @@ def load_messages_from_sqlite(chat_history : CustomSQLChatMessageHistory):
         for m in messages
     ]
 
+def load_conversation_title_list(chat_history : CustomSQLChatMessageHistory) -> List:
+
+    title_map = chat_history.title_map
+
+    return [title_map[i] for i in range(len(title_map))]
 
 configs_fields =[
     ConfigurableFieldSpec(
