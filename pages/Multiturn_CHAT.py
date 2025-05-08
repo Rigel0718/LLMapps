@@ -78,7 +78,11 @@ def main():
                 time.sleep(2)
                 st.rerun()
 
+    # ✅ 로그인이 되었을 경우
     if not st.session_state.user_check_failed and st.session_state.user_id:
+        # 계정의 db 정보 호출
+        st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
+
         conv_list = st.session_state.conversation_list or ["0"]
         selected_conv = st.selectbox("🗂️ 선택할 conversation_num", conv_list, key="conversation_selector")
 
