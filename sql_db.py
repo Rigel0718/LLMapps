@@ -1,6 +1,6 @@
 from typing import Any, Generator, List, Optional, Sequence, cast, Union, Dict
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, sessionmaker, scoped_session, Session as SQLSession
-from sqlalchemy import Integer, Text, create_engine 
+from sqlalchemy import Integer, Text, create_engine, func
 import json
 from langchain_core.messages import messages_from_dict, BaseMessage, message_to_dict
 from abc import ABC, abstractmethod
@@ -53,9 +53,9 @@ class CustomMessageConverter(BaseMessageConverter):
     def from_sql_model(self, sql_message: Any) -> BaseMessage:
         return messages_from_dict([json.loads(sql_message.message)])[0]
 
-    def to_sql_model(self, message: BaseMessage, session_id: str) -> Any:
+    def to_sql_model(self, message: BaseMessage, session_id: str, conversation_title) -> Any:
         return self.model_class(
-            session_id=session_id, message=json.dumps(message_to_dict(message))
+            session_id=session_id, conversation_title=conversation_title, message=json.dumps(message_to_dict(message))
         )
 
     def get_sql_model_class(self) -> Any:
@@ -75,6 +75,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     def __init__(
         self,
         session_id: str,
+        conversation_title: str = None,
         connection: Union[Engine, str] = None,
         table_name: str = "message_store",
         session_id_field_name: str = "session_id",
@@ -92,7 +93,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
 
         self.sql_model_class.metadata.create_all(self.engine)
         self.session_id = session_id
-
+        self.conversation_title = conversation_title or f"untitled_{session_id}"
 
     @property
     def messages(self) -> List[BaseMessage]:  # type: ignore
@@ -136,16 +137,23 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     @property
     def title_map(self) -> dict[str, str]:
         """
-        현재 user 테이블에서 모든 session_id → title 매핑 조회
-        output : {session_id : conversation_title, ...}
+        SQLite에서 session_id 기준으로 하나의 conversation_title을 가져오는 매핑 딕셔너리 생성
         """
         with self._make_sync_session() as session:
-            rows = session.query(
-                getattr(self.sql_model_class, self.session_id_field_name),
-                self.sql_model_class.conversation_title
-            ).distinct().all()
+            session_id_column = getattr(self.sql_model_class, self.session_id_field_name)
+            rows = (
+                session.query(
+                    session_id_column,
+                    func.min(self.sql_model_class.conversation_title)  # 가장 빠른 title 하나만
+                )
+                .filter(session_id_column.isnot(None))
+                .group_by(session_id_column)
+                .all()
+            )
             return {row[0]: row[1] for row in rows}
 
+    def get_title_map(self) -> dict[str, str]:
+        return self.title_map
 
     def store_conversation_title(self, title: str) -> None:
         """처음 대화 생성 시, 빈 메시지와 함께 title을 저장"""

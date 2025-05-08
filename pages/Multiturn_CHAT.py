@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from utils import multiturn_stream_response
+from utils import multiturn_stream_response, get_next_conversation_num
 from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, 
                              check_user_exists, get_conversation_nums, create_user_table_if_not_exists,
                              load_conversation_title_list)
@@ -88,10 +88,9 @@ def main():
         conv_list = load_conversation_title_list(st.session_state.chat_history)
         selected_conv = st.selectbox("🗂️ 선택할 conversation_num", conv_list, key="conversation_selector")
 
-        new_conv = st.text_input("🆕 새 conversation_num 생성", key="new_conv")
+        
         if st.button("➕ Create New Conversation"):
-            st.session_state.conversation_list.append(new_conv)
-            st.session_state.conversation_num = new_conv
+            st.session_state.conversation_num = get_next_conversation_num(st.session_state.conversation_list)
             st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
             time.sleep(3)
             st.rerun()

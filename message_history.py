@@ -4,7 +4,7 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from sql_db import CustomSQLChatMessageHistory, CustomMessageConverter, create_message_model
 from sqlalchemy import create_engine, inspect, text
 from typing import List
-
+from utils import get_next_conversation_num
 engine = create_engine('sqlite:///customdb/custom.db')
 
 def check_user_exists(client_id: str) -> bool:
@@ -66,6 +66,16 @@ def load_conversation_title_list(chat_history : CustomSQLChatMessageHistory) -> 
     title_map = chat_history.title_map
 
     return [title_map[i] for i in range(len(title_map))]
+
+def create_new_conversation(chat_history : CustomSQLChatMessageHistory, conversation_list=None) -> str:
+    _conversation_list = conversation_list or load_conversation_title_list(chat_history)
+    next_conv = get_next_conversation_num(_conversation_list)
+    # store_conversation_title(
+    #     user_id=user_id,
+    #     conversation_num=next_conv,
+    #     title=f"untitled_{next_conv}"
+    # )
+    return next_conv
 
 configs_fields =[
     ConfigurableFieldSpec(
