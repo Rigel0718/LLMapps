@@ -8,9 +8,12 @@ from utils import get_next_conversation_num
 engine = create_engine('sqlite:///customdb/custom.db')
 
 def check_user_exists(client_id: str) -> bool:
-    inspector = inspect(engine)
-    return client_id in inspector.get_table_names()
-
+    with engine.connect() as conn:
+        inspector = inspect(conn)
+        table_names = inspector.get_table_names()
+        print(f"[DEBUG] All tables: {table_names}")
+        return client_id in table_names
+    
 def get_conversation_nums(user_id: str) -> list[str]:
     with engine.connect() as conn:
         query = text(f'SELECT DISTINCT session_id FROM "{user_id}"')
@@ -19,7 +22,9 @@ def get_conversation_nums(user_id: str) -> list[str]:
     
 def create_user_table_if_not_exists(user_id: str):
     model = create_message_model(user_id)
-    model.__table__.create(bind=engine, checkfirst=True)
+    # 모델 메타데이터에서 테이블을 명시적으로 생성
+    with engine.begin() as conn: 
+        model.__table__.create(bind=conn, checkfirst=True)
 
 # def get_message_history_sqlitedb(client_id, conversation_num) -> BaseChatMessageHistory:
 #     return SQLChatMessageHistory(

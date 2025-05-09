@@ -118,13 +118,13 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
 
     def add_message(self, message: BaseMessage) -> None:
         with self._make_sync_session() as session:
-            session.add(self.converter.to_sql_model(message, self.session_id))
+            session.add(self.converter.to_sql_model(message, self.session_id, self.conversation_title))
             session.commit()
 
     def add_messages(self, messages: Sequence[BaseMessage]) -> None:
         with self._make_sync_session() as session:
             for message in messages:
-                session.add(self.converter.to_sql_model(message, self.session_id))
+                session.add(self.converter.to_sql_model(message, self.session_id, self.conversation_title))
             session.commit()
 
     def clear(self) -> None:
