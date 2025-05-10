@@ -67,6 +67,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     SQLChatMessageHistory의 기본 셋에서 async 제거,
     conversation_title의 column추가, 필요한 메소드 추가.
     TODO 나중에 정리가 되면, conversation_title을 따로 관리하는 ORM으로 정규화.
+    TODO engine을 외부에서 조절할 수 있도록 정리, sql_model_class.metadata.create_all(self.engine)이 부분도 중복되지 않도록 처리.
     '''
     @property
     @deprecated("0.2.2", removal="1.0", alternative="session_maker")
@@ -148,7 +149,9 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
                 .order_by(self.sql_model_class.conversation_title)  # (선택) 정렬
                 .all()
             )
-            return [row[0] for row in rows]
+            if not rows or all(row[0] is None for row in rows):
+                return [self.session_id]
+            return [row[0] for row in rows if row[0] is not None]
         
 
     @property
