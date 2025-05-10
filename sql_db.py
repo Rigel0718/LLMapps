@@ -66,6 +66,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
     '''
     SQLChatMessageHistory의 기본 셋에서 async 제거,
     conversation_title의 column추가, 필요한 메소드 추가.
+    TODO 나중에 정리가 되면, conversation_title을 따로 관리하는 ORM으로 정규화.
     '''
     @property
     @deprecated("0.2.2", removal="1.0", alternative="session_maker")
