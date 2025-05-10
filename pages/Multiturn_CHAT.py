@@ -53,14 +53,12 @@ def main():
 
                 # 유저가 존재하는지 확인, 필요한 데이터 로드 후 rerun
                 if check_user_exists(input_user_id):
-                    print('kkkkkkkkkkkkkkkkkkkkkk')
                     st.session_state.user_id = input_user_id
                     # TODO 일단 0으로 놓고 다음에 최신 타이틀로 꺼낼 수 있게 구현
                     st.session_state.conversation_num='0'
                     # 계정의 db 정보 호출
                     st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
                     st.session_state.conversation_list = st.session_state.chat_history.conversation_title_list
-                    print('aaaaaaaaaaaaaa')
                     
                     if "0" not in st.session_state.conversation_list:
                         st.session_state.conversation_list.append("0")
@@ -120,7 +118,6 @@ def main():
         # # 계정의 db에서 conversation_title 추출
         
         # conv_list = load_conversation_title_list(st.session_state.chat_history)
-        print('asdfasdfadsfkkk: ', st.session_state.conversation_list)
         selected_conv = st.selectbox("🗂️ 선택할 conversation_num", st.session_state.conversation_list, key="conversation_selector")
 
         
