@@ -150,7 +150,7 @@ class CustomSQLChatMessageHistory(BaseChatMessageHistory):
                 .all()
             )
             if not rows or all(row[0] is None for row in rows):
-                return [self.session_id]
+                return [self.conversation_title]
             return [row[0] for row in rows if row[0] is not None]
         
 
