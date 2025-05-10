@@ -119,7 +119,9 @@ def main():
 
         
         if st.button("➕ Create New Conversation"):
-            st.session_state.conversation_num = get_next_conversation_num(st.session_state.conversation_list)
+            print('kkdieuf : ', st.session_state.conversation_num)
+            st.session_state.conversation_num = get_next_conversation_num(st.session_state.conversation_num)
+            print('asfdasdfasdf : ', st.session_state.conversation_num)
             st.session_state.conversation_list.append(f'untitled_{st.session_state.conversation_num}')
             st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
             time.sleep(3)
@@ -127,8 +129,8 @@ def main():
             
             
         # conversation_num 선택
-        st.session_state.conversation_num = selected_conv or st.session_state.conversation_num
-        st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
+        st.session_state.conversation_current_num = selected_conv or st.session_state.conversation_num
+        st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_current_num)
         # 메시지 불러오기
         if st.session_state.user_id and st.session_state.conversation_num and st.session_state.conversation_num.strip():
             
