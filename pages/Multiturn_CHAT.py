@@ -59,9 +59,6 @@ def main():
                     # 계정의 db 정보 호출
                     st.session_state.chat_history = get_message_history_sqlitedb(st.session_state.user_id, st.session_state.conversation_num)
                     st.session_state.conversation_list = st.session_state.chat_history.conversation_title_list
-                    
-                    if "0" not in st.session_state.conversation_list:
-                        st.session_state.conversation_list.append("0")
                     st.session_state.user_check_failed = False
                     st.session_state.ready_to_register = False
                 else:
@@ -102,7 +99,7 @@ def main():
                         st.session_state.user_id = new_user_id
                         st.session_state.conversation_num = "0"
                         st.session_state.chat_history = get_message_history_sqlitedb(new_user_id, "0")
-                        st.session_state.conversation_list = ["0"]
+                        st.session_state.conversation_list = ["untitled_0"]
                         st.session_state.user_check_failed = False
                         st.session_state.ready_to_register = False
                         st.session_state.registration_mode = False
@@ -123,7 +120,7 @@ def main():
         
         if st.button("➕ Create New Conversation"):
             st.session_state.conversation_num = get_next_conversation_num(st.session_state.conversation_list)
-            st.session_state.conversation_list.append(st.session_state.conversation_num)
+            st.session_state.conversation_list.append(f'untitled_{st.session_state.conversation_num}')
             st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
             time.sleep(3)
             st.rerun()
