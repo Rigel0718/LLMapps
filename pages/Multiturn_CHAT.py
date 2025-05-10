@@ -122,10 +122,8 @@ def main():
 
         
         if st.button("➕ Create New Conversation"):
-            print('kkiduenfdkjf : ', st.session_state.conversation_list)
             st.session_state.conversation_num = get_next_conversation_num(st.session_state.conversation_list)
             st.session_state.conversation_list.append(st.session_state.conversation_num)
-            print('asdfasdfasdfdsaf : ', st.session_state.conversation_num, st.session_state.conversation_list)
             st.toast("✅ 새로운 대화가 생성되었습니다!", icon="🎉")
             time.sleep(3)
             st.rerun()
