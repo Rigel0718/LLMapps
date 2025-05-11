@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup, SoupStrainer
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders.base import BaseLoader
 
-url = ""
 headers = {
     "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
 }
@@ -30,4 +29,11 @@ def web_loader(url, attrs : dict={}) -> BaseLoader:
     header_template=headers
     )
     return loader
+
+if __name__ == '__main__':
+    url = 'https://turingpost.co.kr/p/8-rag-master-course'
+    attrs = {'id' : ['web-header', 'content-blocks']}
+    loader = web_loader(url,attrs)
+    docs = loader.load()
+    print(docs)
     
