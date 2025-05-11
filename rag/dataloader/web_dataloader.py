@@ -10,21 +10,21 @@ headers = {
 
 
 
-def bs4_web_loader(url):
+def bs4_web_loader(url, attrs : dict={}):
     response = requests.get(url, headers=headers)
     response.encoding = 'utf-8' 
-    soup = BeautifulSoup(response.text, 'html.parser', parse_only=SoupStrainer('div', attrs={'id': ['web-header', 'content-blocks']}))
+    soup = BeautifulSoup(response.text, 'html.parser', parse_only=SoupStrainer('div', attrs=attrs))
     return soup.get_text()
 
 
-def web_loader(url) -> BaseLoader:
+def web_loader(url, attrs : dict={}) -> BaseLoader:
     loader = WebBaseLoader(
     web_path=url,
     encoding='utf-8',
     bs_kwargs=dict(
         parse_only=SoupStrainer(
             'div',
-            attrs={'id' : ['web-header', 'content-blocks']}
+            attrs=attrs
         )
     ),
     header_template=headers
