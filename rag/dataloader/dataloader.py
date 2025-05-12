@@ -5,7 +5,8 @@ from langchain.docstore.document import Document
 import streamlit as st
 import tempfile
 import os
-from typing import List
+from typing import List, Optional
+from pathlib import Path
 
 def get_documents(docs: List[UploadedFile]) -> List[Document]:
     '''
@@ -66,3 +67,50 @@ def get_url_documents(url) -> List[Document]:
         st.error(f'Error loading url document from {url} : {e}')
 
     return doc_list
+
+
+
+class CustomLoader:
+    def __init__(self, splitter=None):
+        self.loader_map = {
+            ".docx": Docx2txtLoader,
+            ".pdf": PyPDFLoader,
+            ".pptx": UnstructuredPowerPointLoader,
+        }
+        self.splitter = splitter  # 기본값 없음
+
+    def get_loader_class(self, file_name: str):
+        ext = Path(file_name).suffix.lower()
+        return self.loader_map.get(ext), ext
+
+    def load_single_file(self, uploaded_file: UploadedFile) -> Optional[List[Document]]:
+        file_bytes = uploaded_file.getvalue()
+        file_name = uploaded_file.name
+
+        loader_class, ext = self.get_loader_class(file_name)
+        if loader_class is None:
+            print(f"⚠️ Unsupported file type: {file_name}")
+            return None
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp_file:
+            tmp_file.write(file_bytes)
+            tmp_path = tmp_file.name
+
+        try:
+            loader = loader_class(tmp_path)
+            if self.splitter:
+                documents = loader.load_and_split(text_splitter=self.splitter)
+            else:
+                documents = loader.load()
+            return documents
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
+    def load_multiple_files(self, files: List[UploadedFile]) -> List[Document]:
+        all_docs = []
+        for f in files:
+            docs = self.load_single_file(f)
+            if docs:
+                all_docs.extend(docs)
+        return all_docs
