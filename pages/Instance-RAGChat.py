@@ -59,6 +59,7 @@ def main():
         if not rag_available():
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
+            # TODO 이 부분을 rag pipeline으로 정리해서 session_state, 코드 정리하기.
             st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size = 900, chunk_overlap = 200)
             st.session_state.dataloader = Custom_Streamlit_FileLoader(splitter=st.session_state.text_splitter)
             documents = []
