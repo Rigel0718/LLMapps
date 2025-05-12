@@ -2,7 +2,8 @@ import streamlit as st
 from langchain_openai import ChatOpenAI
 from rag.retriever import get_conversational_rag_chain
 from rag.vectorstore import load_documents_chroma_vectorstore, load_documents_faiss_vectorsotre
-from rag.dataloader import get_documents, get_url_documents
+from rag.dataloader import get_documents, get_url_documents, Custom_Streamlit_FileLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils import rag_available, convert_chat_history, stream_response
 import uuid
 from dotenv import load_dotenv
@@ -31,7 +32,13 @@ def main():
 
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
-    
+
+    if 'dataloader' not in st.session_state:
+        st.session_state.dataloader = None
+
+    if 'text_splitter' not in st.session_state:
+        st.session_state.text_splitter = None
+
     if 'llm' not in st.session_state:
         st.session_state.llm = None
 
@@ -52,9 +59,11 @@ def main():
         if not rag_available():
             st.sidebar.error('⚠️ No file uploaded. Please upload a file first.')
         else :
+            st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size = 900, chunk_overlap = 200)
+            st.session_state.dataloader = Custom_Streamlit_FileLoader(splitter=st.session_state.text_splitter)
             documents = []
             if st.session_state.upload_files:
-                file_documents = get_documents(st.session_state.upload_files)
+                file_documents = st.session_state.dataloader.load_multiple_streamlit_files(st.session_state.upload_files)
                 documents.extend(file_documents)
             if st.session_state.upload_url:
                 url_documents = get_url_documents(st.session_state.upload_url)
