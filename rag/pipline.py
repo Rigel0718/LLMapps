@@ -7,6 +7,8 @@ from .dataloader import Custom_Streamlit_FileLoader, web_loader
 from .vectorstore import load_documents_faiss_vectorsotre
 from .retriever import get_retrievered_documents
 
+
+# TODO splitter, vectorstore(embeddingmodel), retriever 모두 객체화로 customizing할 수 있게 
 class Custom_RAGPipeline:
     def __init__(
         self,
