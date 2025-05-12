@@ -70,7 +70,7 @@ def get_url_documents(url) -> List[Document]:
 
 
 
-class CustomLoader:
+class Custom_Streamlit_FileLoader:
     def __init__(self, splitter=None):
         self.loader_map = {
             ".docx": Docx2txtLoader,
@@ -83,7 +83,10 @@ class CustomLoader:
         ext = Path(file_name).suffix.lower()
         return self.loader_map.get(ext), ext
 
-    def load_single_file(self, uploaded_file: UploadedFile) -> Optional[List[Document]]:
+    def load_single_streamlit_file(self, uploaded_file: UploadedFile) -> Optional[List[Document]]:
+        '''
+        streamlit의 UploadedFile class만 getvalue, name가지고 있음.
+        '''
         file_bytes = uploaded_file.getvalue()
         file_name = uploaded_file.name
 
@@ -107,10 +110,10 @@ class CustomLoader:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
 
-    def load_multiple_files(self, files: List[UploadedFile]) -> List[Document]:
+    def load_multiple_streamlit_files(self, files: List[UploadedFile]) -> List[Document]:
         all_docs = []
         for f in files:
-            docs = self.load_single_file(f)
+            docs = self.load_single_streamlit_file(f)
             if docs:
                 all_docs.extend(docs)
         return all_docs
