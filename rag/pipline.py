@@ -1,16 +1,20 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.documents import Document
+from langchain_core.runnables import Runnable
 from .dataloader import Custom_Streamlit_FileLoader, web_loader
 from .vectorstore import load_documents_faiss_vectorsotre
-
+from .retriever import get_retrievered_documents
 
 class Custom_RAGPipeline:
     def __init__(
         self,
+        rag_llm: BaseLanguageModel,
         chunk_size: int = 900,
         chunk_overlap: int = 200,
     ):
+        self.rag_llm = rag_llm
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
@@ -23,7 +27,7 @@ class Custom_RAGPipeline:
         self,
         uploaded_files: Optional[List] = None,
         upload_url: Optional[str] = None
-    ):
+    )-> Runnable[Any, List[Document]]:
         documents = []
 
         if uploaded_files:
@@ -33,4 +37,5 @@ class Custom_RAGPipeline:
             documents.extend(web_loader(upload_url))
 
         vectorstore = load_documents_faiss_vectorsotre(documents)
-        return vectorstore
+        retriever_chain = get_retrievered_documents(vectorstore, self.rag_llm)
+        return retriever_chain
