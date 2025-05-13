@@ -1,7 +1,7 @@
 from .llm import get_OpenAILLM
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from utils import get_chat_prompt_yaml
+from .utils import get_chat_prompt_yaml, load_prompt_template
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_core.language_models import LanguageModelLike
@@ -13,10 +13,7 @@ base_dir = os.path.dirname(__file__)
 
 
 def get_vanilla_chain(openai_api_key, model_name):
-    prompt_file = 'normal_prompt.yaml'
-    prompt_path = os.path.join(base_dir, "prompts", prompt_file)
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_path))
-
+    prompt = load_prompt_template("normal_prompt.yaml")
     return prompt | get_OpenAILLM(openai_api_key, model_name) | StrOutputParser()
 
 
@@ -31,9 +28,7 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
     messages : 기존 대화의 흐름 정보
     input : user의 쿼리
     '''
-    prompt_file = 'basic_prompt.yaml'
-    prompt_path = os.path.join(base_dir, "prompts", prompt_file)
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_path))
+    prompt = load_prompt_template("basic_prompt.yaml")
 
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
     
@@ -42,9 +37,5 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
 
 
 def get_conversation_title_chain(openai_api_key, model_name):
-
-    prompt_file = 'query_title_prompt.yaml'
-    prompt_path = os.path.join(base_dir, "prompts", prompt_file)
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_path))
-    
+    prompt = load_prompt_template("query_title_prompt.yaml")
     return prompt | get_OpenAILLM(openai_api_key, model_name) | StrOutputParser()
