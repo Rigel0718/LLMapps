@@ -9,7 +9,6 @@ from langchain_core.vectorstores.base import VectorStore
 from rag.retriever import get_retrievered_documents
 import os
 
-base_dir = os.path.dirname(__file__)
 
 
 def get_vanilla_chain(openai_api_key, model_name):
