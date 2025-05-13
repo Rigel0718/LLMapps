@@ -4,6 +4,7 @@ from .utils import load_prompt_template
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_core.language_models import LanguageModelLike
+from langchain_core.output_parsers.base import BaseOutputParser
 from langchain_core.vectorstores.base import VectorStore
 from rag.retriever import get_retrievered_documents
 from typing import Optional
@@ -45,8 +46,9 @@ class VanillaChain:
         self,
         prompt_file: str,
         llm: Optional[LanguageModelLike] = None,
+        output_parser : Optional[BaseOutputParser] = None,
         openai_api_key: Optional[str] = None,
-        model_name: Optional[str] = None
+        model_name: Optional[str] = None,
     ):
         self.api_key = openai_api_key
         self.model_name = model_name
@@ -54,13 +56,12 @@ class VanillaChain:
 
         self.prompt = self._load_prompt()
         self.llm = llm or self._load_llm()
-        self.parser = StrOutputParser()
+        self.parser = output_parser or StrOutputParser()
 
     def _load_prompt(self):
         return load_prompt_template(self.prompt_file)
 
     def _load_llm(self):
-        from chains.llm import get_OpenAILLM
         return get_OpenAILLM(self.api_key, self.model_name)
 
     @property
