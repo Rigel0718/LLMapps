@@ -1,13 +1,12 @@
 from .llm import get_OpenAILLM
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from .utils import get_chat_prompt_yaml, load_prompt_template
+from .utils import load_prompt_template
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_core.language_models import LanguageModelLike
 from langchain_core.vectorstores.base import VectorStore
 from rag.retriever import get_retrievered_documents
-import os
+from typing import Optional
 
 
 
@@ -38,3 +37,35 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
 def get_conversation_title_chain(openai_api_key, model_name):
     prompt = load_prompt_template("query_title_prompt.yaml")
     return prompt | get_OpenAILLM(openai_api_key, model_name) | StrOutputParser()
+
+
+
+class VanillaChain:
+    def __init__(
+        self,
+        prompt_file: str,
+        llm: Optional[LanguageModelLike] = None,
+        openai_api_key: Optional[str] = None,
+        model_name: Optional[str] = None
+    ):
+        self.api_key = openai_api_key
+        self.model_name = model_name
+        self.prompt_file = prompt_file
+
+        self.prompt = self._load_prompt()
+        self.llm = llm or self._load_llm()
+        self.parser = StrOutputParser()
+
+    def _load_prompt(self):
+        return load_prompt_template(self.prompt_file)
+
+    def _load_llm(self):
+        from chains.llm import get_OpenAILLM
+        return get_OpenAILLM(self.api_key, self.model_name)
+
+    @property
+    def chain(self):
+        return self.prompt | self.llm | self.parser
+    
+    def __call__(self, input : str):
+        return self.chain.invoke({"input": input})
