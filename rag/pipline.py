@@ -5,7 +5,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters.base import TextSplitter
 from langchain_core.runnables import Runnable
 from .dataloader import Custom_Streamlit_FileLoader, web_loader
-from .vectorstore import load_documents_faiss_vectorsotre
+from .vectorstore.vectorstore import load_documents_faiss_vectorsotre
 from .retriever import get_retrievered_documents
 
 

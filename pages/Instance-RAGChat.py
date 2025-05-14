@@ -1,7 +1,7 @@
 import streamlit as st
 from langchain_openai import ChatOpenAI
 from chains.chains import get_conversational_rag_chain
-from rag.vectorstore import load_documents_chroma_vectorstore, load_documents_faiss_vectorsotre
+from rag.vectorstore.vectorstore import load_documents_chroma_vectorstore, load_documents_faiss_vectorsotre
 from rag.dataloader import get_documents, get_url_documents, Custom_Streamlit_FileLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils import rag_available, convert_chat_history, stream_response
