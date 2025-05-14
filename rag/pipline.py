@@ -2,6 +2,7 @@ from typing import Optional, List, Any
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.documents import Document
+from langchain_text_splitters.base import TextSplitter
 from langchain_core.runnables import Runnable
 from .dataloader import Custom_Streamlit_FileLoader, web_loader
 from .vectorstore import load_documents_faiss_vectorsotre
@@ -13,12 +14,12 @@ class Custom_RAGPipeline:
     def __init__(
         self,
         rag_llm: BaseLanguageModel,
-        splitter = None,
+        splitter: TextSplitter = None,
         chunk_size: int = 900,
         chunk_overlap: int = 200,
     ):
         self.rag_llm = rag_llm
-        self.splitter = RecursiveCharacterTextSplitter(
+        self.splitter = splitter or RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
         )
