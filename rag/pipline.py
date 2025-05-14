@@ -13,6 +13,7 @@ class Custom_RAGPipeline:
     def __init__(
         self,
         rag_llm: BaseLanguageModel,
+        splitter = None,
         chunk_size: int = 900,
         chunk_overlap: int = 200,
     ):
