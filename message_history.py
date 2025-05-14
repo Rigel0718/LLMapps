@@ -26,28 +26,6 @@ def create_user_table_if_not_exists(user_id: str):
     with engine.begin() as conn: 
         model.__table__.create(bind=conn, checkfirst=True)
 
-# def get_message_history_sqlitedb(client_id, conversation_num) -> BaseChatMessageHistory:
-#     return SQLChatMessageHistory(
-#         table_name=client_id,
-#         session_id=conversation_num,
-#         connection='sqlite:///customdb/custom.db',
-#         custom_message_converter=CustomMessageConverter(client_id)
-#     )
-
-
-# def load_messages_from_sqlite(client_id: str, conversation_num: str):
-#     history = SQLChatMessageHistory(
-#         table_name=client_id,
-#         session_id=conversation_num,
-#         connection='sqlite:///customdb/custom.db',
-#         custom_message_converter=CustomMessageConverter(client_id)
-#     )
-#     messages = history.messages
-    
-#     return [
-#         {"role": "user" if m.type == "human" else "assistant", "content": m.content}
-#         for m in messages
-#     ]
 
 def get_message_history_sqlitedb(client_id, conversation_num) -> BaseChatMessageHistory:
     return CustomSQLChatMessageHistory(
