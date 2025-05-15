@@ -35,7 +35,7 @@ class Custom_RAGPipeline:
             documents.extend(self.dataloader.load_multiple_streamlit_files(uploaded_files))
 
         if upload_url:
-            documents.extend(self.web_url_loader.load(upload_url))
+            documents.extend(self.web_url_loader.load_and_split(upload_url, text_splitter=self.splitter))
 
         vectorstore = load_documents_faiss_vectorsotre(documents)
         retriever_chain = get_retrievered_documents(vectorstore, self.rag_llm)
