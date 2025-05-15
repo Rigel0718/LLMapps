@@ -1,12 +1,12 @@
 import streamlit as st
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from utils import multiturn_stream_response, get_next_conversation_num
-from message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, 
+from memeory.message_history import (get_message_history_sqlitedb, configs_fields, load_messages_from_sqlite, 
                              check_user_exists, get_conversation_nums, create_user_table_if_not_exists,
                              load_conversation_title_list)
 from chains.chains import get_vanilla_chain
 import time
-from sql_db import CustomSQLChatMessageHistory
+from memeory.sql_db import CustomSQLChatMessageHistory
 MODEL = ['gpt-4o-mini', 'o3-mini']
 DBURL = 'sqlite:///customdb/custom.db'
 
