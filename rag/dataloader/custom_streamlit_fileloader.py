@@ -1,6 +1,7 @@
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from langchain.docstore.document import Document
+from langchain_community.document_loaders.base import BaseLoader
 import tempfile
 import os
 from typing import List, Optional
@@ -36,7 +37,7 @@ class Custom_Streamlit_FileLoader:
             tmp_path = tmp_file.name
 
         try:
-            loader = loader_class(tmp_path)
+            loader : BaseLoader = loader_class(tmp_path)
             if self.splitter:
                 documents = loader.load_and_split(text_splitter=self.splitter)
             else:
