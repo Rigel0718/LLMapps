@@ -1,7 +1,7 @@
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain_core.runnables.utils import ConfigurableFieldSpec
 from langchain_core.chat_history import BaseChatMessageHistory
-from sql_db import CustomSQLChatMessageHistory, CustomMessageConverter, create_message_model
+from memeory.sql_db import CustomSQLChatMessageHistory, CustomMessageConverter, create_message_model
 from sqlalchemy import create_engine, inspect, text
 from typing import List
 from utils import get_next_conversation_num
