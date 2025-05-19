@@ -1,4 +1,6 @@
 messages:
+  - role: system
+    content: "You are a query rewriter that generates better search queries."
   - role: placeholder
     content: "{messages}"
   - role: user
