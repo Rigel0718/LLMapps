@@ -68,6 +68,6 @@ def get_vanilla_chain(openai_api_key, model_name):
 
 
 def get_conversation_title_chain(openai_api_key, model_name):
-    return VanillaChain(prompt_file="query_title_prompt.yaml",
+    return VanillaChain(prompt_file="chat_title_generator_prompt.yaml",
                         llm=get_OpenAILLM(openai_api_key, model_name),
                         output_parser=StrOutputParser())
