@@ -1,8 +1,7 @@
-# from langchain.chains.history_aware_retriever import create_history_aware_retriever
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain_core.language_models import LanguageModelLike
-from langchain.chains import create_history_aware_retriever, create_retrieval_chain
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.chains import create_history_aware_retriever
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.base import Runnable
 from langchain_core.vectorstores.base import VectorStore
 from langchain.docstore.document import Document
@@ -22,9 +21,6 @@ def get_retrievered_documents(vectorstore : VectorStore, llm : LanguageModelLike
     '''
     vectorstore의 retriever를 이용하여, 기존 대화 기록을 반영하는 검색 쿼리를 생성하는 체인 구성
     즉, 대화의 흐름을 고려하여 어떤 내용을 검색해야하는지 결정하는 '체인'을 생성하는 함수.
-
-    TODO 
-    ConversationBufferMemory 사용해서 MessagePlaceholder대체
     '''
 
     # vectorstore의 retriever 설정
