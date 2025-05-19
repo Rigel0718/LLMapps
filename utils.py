@@ -72,3 +72,14 @@ def get_chat_prompt_yaml(file_path):
 def get_next_conversation_num(conversation_list: List[str]) -> str:
     nums = [int(c) for c in conversation_list if c.isdigit()]
     return str(max(nums) + 1) if nums else "0"
+
+
+# Helper function for printing docs
+
+
+def pretty_print_docs(docs):
+    print(
+        f"\n{'-' * 100}\n".join(
+            [f"Document {i+1}:\n\n" + d.page_content for i, d in enumerate(docs)]
+        )
+    )
