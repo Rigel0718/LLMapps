@@ -6,7 +6,7 @@ from langchain.chains import create_retrieval_chain
 from langchain_core.language_models import LanguageModelLike
 from langchain_core.output_parsers.base import BaseOutputParser
 from langchain_core.vectorstores.base import VectorStore
-from rag.retriever import get_retrievered_documents
+from rag.retriever.retriever import get_retrievered_documents
 from typing import Optional
 
 
