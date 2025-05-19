@@ -25,7 +25,7 @@ def get_retrievered_documents(vectorstore : VectorStore, llm : LanguageModelLike
 
     # vectorstore의 retriever 설정
     retriever = vectorstore.as_retriever()
-    prompt_filepath = './retriever_prompt/chat_query_rewrite_prompt.yaml'
+    prompt_filepath = 'chat_query_rewrite_prompt.yaml'
     prompt = load_prompt_template(prompt_filepath)
     # 체인 생성
     retriever_chain : List[Document] = create_history_aware_retriever(llm, retriever, prompt)
@@ -34,6 +34,10 @@ def get_retrievered_documents(vectorstore : VectorStore, llm : LanguageModelLike
 
 
 if __name__ == '__main__':
-    prompt_filepath = './retriever_prompt/chat_query_rewrite_prompt.yaml'
+    # from pathlib import Path
+    # base_path = Path(__file__).parent
+    # prompt_filepath = base_path / 'retriever_prompt' / 'chat_query_rewrite_prompt.yaml'
+    prompt_filepath = 'chat_query_rewrite_prompt.yaml'
+    print(prompt_filepath)
     prompt = load_prompt_template(prompt_filepath)
     print(prompt)
