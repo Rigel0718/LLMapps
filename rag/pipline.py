@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters.base import TextSplitter
 from langchain_core.runnables import Runnable
 from .vectorstore.vectorstore import load_documents_faiss_vectorsotre
-from .retriever import get_retrievered_documents
+from .retriever.retriever import get_retrievered_documents
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.vectorstores.base import VectorStore
 
