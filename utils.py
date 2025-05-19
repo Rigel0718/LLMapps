@@ -1,7 +1,6 @@
 import streamlit as st
 import time
 from langchain.schema import AIMessage, HumanMessage
-import yaml
 from langchain_core.runnables import Runnable
 from typing import List
 
@@ -64,10 +63,6 @@ def rag_available() -> bool:
     '''
     return st.session_state.upload_files  or st.session_state.upload_url 
 
-def get_chat_prompt_yaml(file_path):
-    with open(file_path, "r", encoding='utf8') as f:
-        yaml_content = yaml.safe_load(f)
-        return [(message['role'], message['content']) for message in yaml_content['messages']]
     
 def get_next_conversation_num(conversation_list: List[str]) -> str:
     nums = [int(c) for c in conversation_list if c.isdigit()]
