@@ -53,7 +53,7 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
     messages : 기존 대화의 흐름 정보
     input : user의 쿼리
     '''
-    prompt = load_prompt_template("basic_prompt.yaml")
+    prompt = load_prompt_template("chat_context_answer_prompt.yaml")
 
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)   
     
