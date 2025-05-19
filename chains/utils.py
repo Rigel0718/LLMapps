@@ -1,6 +1,8 @@
 import yaml
 import os
 from langchain_core.prompts import ChatPromptTemplate
+from langchain.prompts import load_prompt  # chat 형식이 아닌 그냥 prompt인경우 ChatPromptTemplate (x), PromptTemplate(o)
+
 
 base_dir = os.path.dirname(__file__)  # 이 파일 기준
 
