@@ -6,7 +6,7 @@ from langchain_core.runnables.base import Runnable
 from langchain_core.vectorstores.base import VectorStore
 from langchain.docstore.document import Document
 from typing import Any, List
-from .utils import get_chat_prompt_yaml
+from .utils import load_prompt_template
 
 '''
 대화의 흐름과 vectorstore의 자료, 두 가지 모두 참고하여 대화하는 chat bot chain.
@@ -26,7 +26,7 @@ def get_retrievered_documents(vectorstore : VectorStore, llm : LanguageModelLike
     # vectorstore의 retriever 설정
     retriever = vectorstore.as_retriever()
     prompt_filepath = './retriever_prompt/chat_query_rewrite_prompt.yaml'
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
+    prompt = load_prompt_template(prompt_filepath)
     # 체인 생성
     retriever_chain : List[Document] = create_history_aware_retriever(llm, retriever, prompt)
 
@@ -35,5 +35,5 @@ def get_retrievered_documents(vectorstore : VectorStore, llm : LanguageModelLike
 
 if __name__ == '__main__':
     prompt_filepath = './retriever_prompt/chat_query_rewrite_prompt.yaml'
-    prompt = ChatPromptTemplate.from_messages(get_chat_prompt_yaml(prompt_filepath))
+    prompt = load_prompt_template(prompt_filepath)
     print(prompt)
