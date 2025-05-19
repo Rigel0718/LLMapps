@@ -62,7 +62,7 @@ def get_conversational_rag_chain(vectorstore : VectorStore, openai_api_key, mode
 
 
 def get_vanilla_chain(openai_api_key, model_name):
-    return VanillaChain(prompt_file="normal_prompt.yaml",
+    return VanillaChain(prompt_file="chat_history_qa_prompt.yaml",
                         llm=get_OpenAILLM(openai_api_key, model_name),
                         output_parser=StrOutputParser())
 
