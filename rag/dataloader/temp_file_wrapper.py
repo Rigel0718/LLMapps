@@ -28,3 +28,34 @@ def with_temp_file(preprocess_fn : Optional[Callable[[bytes, str], bytes]] = Non
         
         return wrapper
     return decorator
+
+
+from contextlib import contextmanager
+from typing import Generator
+
+@contextmanager
+def temp_file_from_bytes(file_bytes: bytes, file_name: str, preprocess_fn=None) -> Generator[str, None, None]:
+    """
+    ex)
+
+    with temp_file_from_bytes(file_bytes, file_name, preprocess_fn=my_preprocess) as tmp_path:
+    loader = PyPDFLoader(tmp_path)
+    docs = loader.load()
+    
+    """
+    suffix = Path(file_name).suffix
+    if not suffix:
+        raise ValueError(f"File '{file_name}' has no extension.")
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+        processed_bytes = preprocess_fn(file_bytes, file_name) if preprocess_fn else file_bytes
+        tmp_file.write(processed_bytes)
+        tmp_path = tmp_file.name
+
+    try:
+        yield tmp_path
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
