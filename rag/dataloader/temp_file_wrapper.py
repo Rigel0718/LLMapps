@@ -7,6 +7,12 @@ import os
 def with_temp_file(preprocess_fn : Optional[Callable[[bytes, str], bytes]] = None):
     '''
     file_bytes의 전처리가 필요한 경우 preprocess_fn에 함수형태로 입력 (ex 이미지 전처리, text encoding .. etc)
+
+    ex)
+    @with_temp_file(preprocess_fn=None)  
+    def load_pdf(tmp_path: str, file_name: str) -> List[Document]:
+        loader = PyPDFLoader(tmp_path)
+        return loader.load()
     '''
     def decorator(func):
         @wraps(func)
