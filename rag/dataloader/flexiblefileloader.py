@@ -1,10 +1,11 @@
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader
 from langchain_community.document_loaders.base import BaseLoader
-from typing import Optional, Callable, List, Type
+from typing import Optional, Callable, List, Type, Tuple
 from pathlib import Path
 from .temp_file_wrapper import with_temp_file
 from langchain.docstore.document import Document
 from langchain_text_splitters.base import TextSplitter
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 class FlexibleFileLoader:
     def __init__(
@@ -41,3 +42,9 @@ class FlexibleFileLoader:
         if splitter:
             self.splitter = splitter
         return self.load_documents(file_bytes, file_name)
+    
+
+def extract_streamlit_file_info(uploaded_file: UploadedFile) -> Tuple[bytes, str]:
+    file_bytes = uploaded_file.getvalue()
+    file_name = uploaded_file.name
+    return file_bytes, file_name
