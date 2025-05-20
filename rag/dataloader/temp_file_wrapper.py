@@ -13,6 +13,8 @@ def with_temp_file(preprocess_fn : Optional[Callable[[bytes, str], bytes]] = Non
     def load_pdf(tmp_path: str, file_name: str) -> List[Document]:
         loader = PyPDFLoader(tmp_path)
         return loader.load()
+
+    documents = load_pdf(file_bytes, file_name)
     '''
     def decorator(func):
         @wraps(func)
