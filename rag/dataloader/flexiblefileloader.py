@@ -4,11 +4,12 @@ from typing import Optional, Callable, List, Type
 from pathlib import Path
 from .temp_file_wrapper import with_temp_file
 from langchain.docstore.document import Document
+from langchain_text_splitters.base import TextSplitter
 
 class FlexibleFileLoader:
     def __init__(
         self,
-        splitter=None,
+        splitter: TextSplitter=None,
         preprocess_fn: Optional[Callable[[bytes], bytes]] = None
     ):
         self.splitter = splitter
@@ -36,5 +37,7 @@ class FlexibleFileLoader:
             return loader.load()
         
 
-    def load(self, file_bytes: bytes, file_name: str) -> List:
+    def load(self, file_bytes: bytes, file_name: str, splitter: TextSplitter= None) -> List[Document]:
+        if splitter:
+            self.splitter = splitter
         return self.load_documents(file_bytes, file_name)
