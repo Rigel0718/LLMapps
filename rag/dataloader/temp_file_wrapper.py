@@ -1,0 +1,30 @@
+from functools import wraps
+from typing import Callable, Optional
+from pathlib import Path
+import tempfile
+import os
+
+def with_temp_file(preprocess_fn : Optional[Callable[[bytes, str], bytes]] = None):
+    '''
+    file_bytes의 전처리가 필요한 경우 preprocess_fn에 함수형태로 입력 (ex 이미지 전처리, text encoding .. etc)
+    '''
+    def decorator(func):
+        @wraps(func)
+        def wrapper(file_bytes: bytes, file_name: str, *args, **kwargs):
+            suffix = Path(file_name).suffix
+            if not suffix:
+                raise ValueError(f"File {file_name} has no extension")
+            processed = preprocess_fn(file_bytes, file_name) if preprocess_fn else file_bytes
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+                tmp_file.write(processed)
+                tmp_path = tmp_file.name
+
+            try:
+                return func(tmp_path, file_name, *args, *kwargs)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+        
+        return wrapper
+    return decorator
