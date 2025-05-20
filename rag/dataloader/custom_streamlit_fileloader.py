@@ -3,6 +3,7 @@ from langchain_community.document_loaders.base import BaseLoader
 from typing import Optional, Callable, List, Type
 from pathlib import Path
 from .temp_file_wrapper import with_temp_file
+from langchain.docstore.document import Document
 
 class FlexibleFileLoader:
     def __init__(
@@ -23,15 +24,12 @@ class FlexibleFileLoader:
         return self.loader_map.get(suffix)
 
     @with_temp_file()
-    def make_loader(self, temp_path: str) -> BaseLoader:
+    def get_documents(self, temp_path: str) -> List[Document]:
         loader_class = self.get_loader_class(temp_path)
         if not loader_class:
             raise ValueError(f"Unsupported file type: {Path(temp_path).suffix}")
-        return loader_class(temp_path)
-
-    def load(self, file_bytes: bytes, file_name: str) -> List:
-        suffix = Path(file_name).suffix
-        loader = self.make_loader(file_bytes, suffix)
+        
+        loader = loader_class(temp_path)
         if self.splitter:
             return loader.load_and_split(text_splitter=self.splitter)
         else:
