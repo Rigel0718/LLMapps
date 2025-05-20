@@ -10,9 +10,9 @@ def with_temp_file(preprocess_fn : Optional[Callable[[bytes, str], bytes]] = Non
 
     ex)
     @with_temp_file(preprocess_fn=None)  
-    def load_pdf(tmp_path: str, file_name: str) -> List[Document]:
+    def load_pdf(tmp_path: str) -> List[Document]:
         loader = PyPDFLoader(tmp_path)
-        return loader.load()
+        return loader
 
     documents = load_pdf(file_bytes, file_name)
     '''
@@ -29,7 +29,7 @@ def with_temp_file(preprocess_fn : Optional[Callable[[bytes, str], bytes]] = Non
                 tmp_path = tmp_file.name
 
             try:
-                return func(tmp_path, file_name, *args, *kwargs)
+                return func(tmp_path, *args, *kwargs)
             finally:
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)
