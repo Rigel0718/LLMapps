@@ -1,56 +1,38 @@
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader
-from streamlit.runtime.uploaded_file_manager import UploadedFile
-from langchain.docstore.document import Document
 from langchain_community.document_loaders.base import BaseLoader
-import tempfile
-import os
-from typing import List, Optional
+from typing import Optional, Callable, List, Type
 from pathlib import Path
+from .temp_file_wrapper import with_temp_file
 
-class Custom_Streamlit_FileLoader:
-    def __init__(self, splitter=None):
-        self.loader_map = {
-            ".docx": Docx2txtLoader,
+class FlexibleFileLoader:
+    def __init__(
+        self,
+        splitter=None,
+        preprocess_fn: Optional[Callable[[bytes], bytes]] = None
+    ):
+        self.splitter = splitter
+        self.preprocess_fn = preprocess_fn
+        self.loader_map: dict[str, Type[BaseLoader]] = {
             ".pdf": PyPDFLoader,
+            ".docx": Docx2txtLoader,
             ".pptx": UnstructuredPowerPointLoader,
         }
-        self.splitter = splitter  # 기본값 없음
 
-    def get_loader_class(self, file_name: str):
-        ext = Path(file_name).suffix.lower()
-        return self.loader_map.get(ext), ext
+    def get_loader_class(self, file_path: str) -> Optional[Type[BaseLoader]]:
+        suffix = Path(file_path).suffix.lower()
+        return self.loader_map.get(suffix)
 
-    def load_single_streamlit_file(self, uploaded_file: UploadedFile) -> Optional[List[Document]]:
-        '''
-        streamlit의 UploadedFile class만 getvalue, name가지고 있음.
-        '''
-        file_bytes = uploaded_file.getvalue() # 바이트 데이터 추출 (UploadedFile객체는 BytesIO 객체를 상속한다 즉 file_like 객체)
-        file_name = uploaded_file.name
+    @with_temp_file()
+    def make_loader(self, temp_path: str) -> BaseLoader:
+        loader_class = self.get_loader_class(temp_path)
+        if not loader_class:
+            raise ValueError(f"Unsupported file type: {Path(temp_path).suffix}")
+        return loader_class(temp_path)
 
-        loader_class, ext = self.get_loader_class(file_name)
-        if loader_class is None:
-            print(f"⚠️ Unsupported file type: {file_name}")
-            return None
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp_file:
-            tmp_file.write(file_bytes)
-            tmp_path = tmp_file.name
-
-        try:
-            loader : BaseLoader = loader_class(tmp_path)
-            if self.splitter:
-                documents = loader.load_and_split(text_splitter=self.splitter)
-            else:
-                documents = loader.load()
-            return documents
-        finally:
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)
-
-    def load_multiple_streamlit_files(self, files: List[UploadedFile]) -> List[Document]:
-        all_docs = []
-        for f in files:
-            docs = self.load_single_streamlit_file(f)
-            if docs:
-                all_docs.extend(docs)
-        return all_docs
+    def load(self, file_bytes: bytes, file_name: str) -> List:
+        suffix = Path(file_name).suffix
+        loader = self.make_loader(file_bytes, suffix)
+        if self.splitter:
+            return loader.load_and_split(text_splitter=self.splitter)
+        else:
+            return loader.load()
