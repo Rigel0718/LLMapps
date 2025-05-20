@@ -34,3 +34,7 @@ class FlexibleFileLoader:
             return loader.load_and_split(text_splitter=self.splitter)
         else:
             return loader.load()
+        
+
+    def load(self, file_bytes: bytes, file_name: str) -> List:
+        return self.load_documents(file_bytes, file_name)
