@@ -40,3 +40,4 @@ class Custom_RAGPipeline:
         vectorstore = load_documents_faiss_vectorsotre(documents)
         retriever_chain = get_retrievered_documents(vectorstore, self.rag_llm)
         return retriever_chain
+        

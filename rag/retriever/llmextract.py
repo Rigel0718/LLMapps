@@ -8,13 +8,23 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAI
 
+
 def get_compression_retriever(compressor, retriever):
     return ContextualCompressionRetriever(
     base_compressor=compressor, base_retriever=retriever
 )
 
 
+embeddings = OpenAIEmbeddings()
+embeddings_filter = EmbeddingsFilter(embeddings=embeddings, similarity_threshold=0.76)
+get_compression_retriever(compressor=embeddings_filter)
 
+splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=0)
+redundant_filter = EmbeddingsRedundantFilter(embeddings=embeddings) 
+relevant_filter = EmbeddingsFilter(embeddings=embeddings, similarity_threshold=0.76)
+pipeline_compressor = DocumentCompressorPipeline(
+    transformers=[splitter, redundant_filter, relevant_filter]
+)
 
 if __name__ == '__main__':
     from langchain_openai import OpenAIEmbeddings
@@ -34,7 +44,7 @@ if __name__ == '__main__':
 
     embeddings = OpenAIEmbeddings()
     embeddings_filter = EmbeddingsFilter(embeddings=embeddings, similarity_threshold=0.76)
-    get_compression_retriever(compressor=embeddings_filter, )
+    get_compression_retriever(compressor=embeddings_filter)
     print(compressed_docs)
 
 
