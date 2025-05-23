@@ -7,7 +7,9 @@ from .vectorstore.vectorstore import load_documents_faiss_vectorsotre
 from .retriever.retriever import get_retrievered_documents
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.vectorstores.base import VectorStore
-
+from dataloader import FlexibleFileLoader, web_loader
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 
 class Custom_RAGPipeline:
     def __init__(
@@ -40,4 +42,11 @@ class Custom_RAGPipeline:
         vectorstore = load_documents_faiss_vectorsotre(documents)
         retriever_chain = get_retrievered_documents(vectorstore, self.rag_llm)
         return retriever_chain
-        
+    
+
+    pipline = Custom_RAGPipeline((
+        FlexibleFileLoader(),
+        web_loader(),
+        OpenAIEmbeddings(),
+        FAISS.from_documents(documents)
+    )
