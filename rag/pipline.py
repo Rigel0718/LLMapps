@@ -1,4 +1,4 @@
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Union
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.documents import Document
 from langchain_text_splitters.base import TextSplitter
@@ -14,7 +14,7 @@ from langchain_community.vectorstores import FAISS
 class Custom_RAGPipeline:
     def __init__(
         self,
-        data_loader : BaseLoader,
+        data_loader : Union[BaseLoader, FlexibleFileLoader],
         web_url_loader : BaseLoader,
         rag_llm: BaseLanguageModel,
         splitter: TextSplitter,
