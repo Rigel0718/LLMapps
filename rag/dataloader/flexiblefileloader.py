@@ -49,7 +49,6 @@ class FlexibleFileLoader:
         return documents
     
 
-def extract_streamlit_file_info(uploaded_file: UploadedFile) -> Tuple[bytes, str]:
-    file_bytes = uploaded_file.getvalue()
-    file_name = uploaded_file.name
-    return file_bytes, file_name
+def extract_streamlit_file_info(uploaded_files: List[UploadedFile]) -> List[FileInput]:
+    return [FileInput(content=f.getvalue(), filename=f.name) for f in uploaded_files]
+
