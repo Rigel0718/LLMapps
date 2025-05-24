@@ -7,7 +7,7 @@ from .vectorstore.vectorstore import load_documents_faiss_vectorsotre
 from .retriever.retriever import get_retrievered_documents
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.vectorstores.base import VectorStore
-from dataloader import FlexibleFileLoader, web_loader
+from dataloader import FlexibleFileLoader, web_loader, FileInput
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
@@ -28,20 +28,22 @@ class Custom_RAGPipeline:
 
     def run(
         self,
-        uploaded_files: Optional[List] = None,
-        upload_url: Optional[str] = None
-    )-> Runnable[Any, List[Document]]:
+        file_inputs: Optional[List[FileInput]] = None,
+        url_inputs: Optional[List[str]] = None,
+    ) -> Runnable[Any, List[Document]]:
         documents = []
 
-        if uploaded_files:
-            documents.extend(self.dataloader.load_multiple_streamlit_files(uploaded_files))
+        if file_inputs:
+            documents.extend(self.dataloader.load(file_inputs, splitter=self.splitter))
 
-        if upload_url:
-            documents.extend(self.web_url_loader.load_and_split(upload_url, text_splitter=self.splitter))
+        if url_inputs:
+            for url in url_inputs:
+                documents.extend(
+                    self.web_url_loader.load_and_split(url, text_splitter=self.splitter)
+                )
 
         vectorstore = load_documents_faiss_vectorsotre(documents)
-        retriever_chain = get_retrievered_documents(vectorstore, self.rag_llm)
-        return retriever_chain
+        return get_retrievered_documents(vectorstore, self.rag_llm)
     
 
     
