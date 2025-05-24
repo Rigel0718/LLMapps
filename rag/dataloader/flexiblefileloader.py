@@ -52,3 +52,5 @@ class FlexibleFileLoader:
 def extract_streamlit_file_info(uploaded_files: List[UploadedFile]) -> List[FileInput]:
     return [FileInput(content=f.getvalue(), filename=f.name) for f in uploaded_files]
 
+def extract_file_paths(file_paths: List[str]) -> List[FileInput]:
+    return [FileInput(content=Path(p).read_bytes(), filename=Path(p).name) for p in file_paths] 
