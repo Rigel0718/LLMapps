@@ -10,10 +10,8 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 class FlexibleFileLoader:
     def __init__(
         self,
-        splitter: TextSplitter=None,
         preprocess_fn: Optional[Callable[[bytes], bytes]] = None
     ):
-        self.splitter = splitter
         self.preprocess_fn = preprocess_fn
         self.loader_map: dict[str, Type[BaseLoader]] = {
             ".pdf": PyPDFLoader,
@@ -25,23 +23,23 @@ class FlexibleFileLoader:
         suffix = Path(file_path).suffix.lower()
         return self.loader_map.get(suffix)
 
-    @with_temp_file()
-    def get_documents(self, temp_path: str) -> List[Document]:
+    @with_temp_file(preprocess_fn=None)
+    def get_documents(self, temp_path: str, splitter: Optional[TextSplitter] = None) -> List[Document]:
         loader_class = self.get_loader_class(temp_path)
         if not loader_class:
             raise ValueError(f"Unsupported file type: {Path(temp_path).suffix}")
-        
         loader = loader_class(temp_path)
-        if self.splitter:
-            return loader.load_and_split(text_splitter=self.splitter)
-        else:
-            return loader.load()
-        
+        return loader.load_and_split(text_splitter=splitter) if splitter else loader.load()
 
-    def load(self, file_bytes: bytes, file_name: str, splitter: TextSplitter=None) -> List[Document]:
-        if splitter:
-            self.splitter = splitter
-        return self.load_documents(file_bytes, file_name)
+    def load(
+        self,
+        files: List[Tuple[bytes, str]],
+        splitter: Optional[TextSplitter] = None
+    ) -> List[Document]:
+        documents = []
+        for file_bytes, file_name in files:
+            documents.extend(self.get_documents(file_bytes, file_name, splitter))
+        return documents
     
 
 def extract_streamlit_file_info(uploaded_file: UploadedFile) -> Tuple[bytes, str]:
