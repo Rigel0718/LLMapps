@@ -44,9 +44,12 @@ class Custom_RAGPipeline:
         return retriever_chain
     
 
-    pipline = Custom_RAGPipeline((
-        FlexibleFileLoader(),
-        web_loader(),
-        OpenAIEmbeddings(),
-        FAISS.from_documents(documents)
-    )
+    
+    def custom_rag_pipeline(documents):
+        return Custom_RAGPipeline(
+            FlexibleFileLoader(),
+            web_loader(),
+            OpenAIEmbeddings(),
+            FAISS.from_documents(documents)
+            )
+        
