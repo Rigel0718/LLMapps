@@ -40,12 +40,12 @@ class FlexibleFileLoader:
 
     def load(
         self,
-        files: List[Tuple[bytes, str]],
+        files: List[FileInput],
         splitter: Optional[TextSplitter] = None
-    ) -> List[Document]:
+        ) -> List[Document]:
         documents = []
-        for file_bytes, file_name in files:
-            documents.extend(self.get_documents(file_bytes, file_name, splitter))
+        for file in files:
+            documents.extend(self.get_documents(file.content, file.filename, splitter))
         return documents
     
 
