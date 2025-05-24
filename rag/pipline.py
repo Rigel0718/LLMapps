@@ -44,16 +44,3 @@ class Custom_RAGPipeline:
 
         vectorstore = load_documents_faiss_vectorsotre(documents)
         return get_retrievered_documents(vectorstore, self.rag_llm)
-    
-
-    
-    def custom_rag_pipeline(documents):
-        return Custom_RAGPipeline(
-            FlexibleFileLoader(
-
-            ),
-            web_loader(),
-            OpenAIEmbeddings(),
-            FAISS.from_documents(documents)
-            )
-        
