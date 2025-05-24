@@ -7,9 +7,7 @@ from .vectorstore.vectorstore import load_documents_faiss_vectorsotre
 from .retriever.retriever import get_retrievered_documents
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.vectorstores.base import VectorStore
-from dataloader import FlexibleFileLoader, web_loader, FileInput
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
+from dataloader import FlexibleFileLoader, FileInput
 
 class Custom_RAGPipeline:
     def __init__(
