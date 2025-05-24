@@ -6,6 +6,13 @@ from .temp_file_wrapper import with_temp_file
 from langchain.docstore.document import Document
 from langchain_text_splitters.base import TextSplitter
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+from pydantic import BaseModel, Field
+
+class FileInput(BaseModel):
+    content: bytes
+    filename: str = Field(..., description="Original filename including extension")
+
+
 
 class FlexibleFileLoader:
     def __init__(
