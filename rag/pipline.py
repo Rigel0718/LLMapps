@@ -17,8 +17,8 @@ class Custom_RAGPipeline:
         data_loader : Union[BaseLoader, FlexibleFileLoader],
         web_url_loader : BaseLoader,
         rag_llm: BaseLanguageModel,
-        splitter: TextSplitter,
         vectorstore : VectorStore,
+        splitter: TextSplitter=None,
     ):
         self.rag_llm = rag_llm
         self.splitter = splitter
@@ -47,7 +47,9 @@ class Custom_RAGPipeline:
     
     def custom_rag_pipeline(documents):
         return Custom_RAGPipeline(
-            FlexibleFileLoader(),
+            FlexibleFileLoader(
+
+            ),
             web_loader(),
             OpenAIEmbeddings(),
             FAISS.from_documents(documents)
